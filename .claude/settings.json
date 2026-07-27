@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c ' *)",
+      "Bash(npm -v)",
+      "Bash(brew list *)",
+      "Bash(command -v nvm)",
+      "Read(//Users/dev_niel/**)",
+      "Bash(command -v volta)",
+      "Bash(command -v fnm)",
+      "Read(//opt/homebrew/Cellar/simdjson/4.6.4/lib/**)",
+      "Read(//opt/homebrew/Cellar/simdjson/**)",
+      "Bash(brew reinstall *)",
+      "Bash(npx --yes create-next-app@latest . --typescript --eslint --app --no-src-dir --import-alias \"@/*\" --use-npm --turbopack --yes)"
+    ]
+  }
+}
