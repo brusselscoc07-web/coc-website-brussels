@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1785365144859,
+      "tag": "0000_old_marten_broadcloak",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1785367515382,
+      "tag": "0001_naive_hammerhead",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1785367958264,
+      "tag": "0002_late_marvex",
+      "breakpoints": true
+    }
+  ]
+}

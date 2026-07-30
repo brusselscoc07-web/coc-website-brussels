@@ -1,38 +1,74 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import type { Comment } from "@/lib/data";
+import { submitComment, type CommentFormState } from "@/app/sermons/[slug]/actions";
+import { toggleReaction } from "@/app/sermons/[slug]/reactions";
+import type { ReactionCounts, ReactionKind } from "@/lib/reaction-kinds";
 
-type ReactionKind = "heart" | "pray" | "amen";
+const initialCommentState: CommentFormState = {};
 
 export default function SermonInteractive({
+  sermonId,
   shareUrl,
+  justCommented,
   comments,
+  initialReactions,
+  initialMyReaction,
 }: {
+  sermonId: string;
   shareUrl: string;
+  justCommented: boolean;
   comments: Comment[];
+  initialReactions: ReactionCounts;
+  initialMyReaction: ReactionKind | null;
 }) {
   const [copyModalOpen, setCopyModalOpen] = useState(false);
   const [copyButtonState, setCopyButtonState] = useState<"idle" | "copied">("idle");
-  const [reactions, setReactions] = useState({ heart: 24, pray: 15, amen: 31 });
-  const [myReaction, setMyReaction] = useState<ReactionKind | null>(null);
-  const [commentDraft, setCommentDraft] = useState({ name: "", email: "", text: "" });
-  const [commentSubmitted, setCommentSubmitted] = useState(false);
+  const [reactions, setReactions] = useState(initialReactions);
+  const [myReaction, setMyReaction] = useState<ReactionKind | null>(initialMyReaction);
+  const [reactionPending, setReactionPending] = useState(false);
   const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const linkInputRef = useRef<HTMLInputElement>(null);
 
-  function react(kind: ReactionKind) {
+  const [commentState, commentFormAction, isCommentPending] = useActionState(
+    submitComment.bind(null, sermonId),
+    initialCommentState,
+  );
+
+  // Calling the Server Action directly (not through a <form>/useActionState)
+  // avoids Next.js's implicit same-request re-render of this DB-reading page
+  // after the mutation — see app/sermons/[slug]/actions.ts for why that
+  // combination hung PGlite in local dev. Optimistic update first for instant
+  // feedback, then reconcile with the server's authoritative counts.
+  async function react(kind: ReactionKind) {
+    if (reactionPending) return;
+    const prevReactions = reactions;
+    const prevMyReaction = myReaction;
+
     setReactions((cur) => {
       const next = { ...cur };
       if (myReaction === kind) {
         next[kind] -= 1;
-        return next;
+      } else {
+        if (myReaction) next[myReaction] -= 1;
+        next[kind] += 1;
       }
-      if (myReaction) next[myReaction] -= 1;
-      next[kind] += 1;
       return next;
     });
     setMyReaction((cur) => (cur === kind ? null : kind));
+    setReactionPending(true);
+
+    try {
+      const result = await toggleReaction(sermonId, kind);
+      setReactions(result.counts);
+      setMyReaction(result.myReaction);
+    } catch {
+      setReactions(prevReactions);
+      setMyReaction(prevMyReaction);
+    } finally {
+      setReactionPending(false);
+    }
   }
 
   function copyLink() {
@@ -42,12 +78,6 @@ export default function SermonInteractive({
     setCopyButtonState("copied");
     if (copyTimer.current) clearTimeout(copyTimer.current);
     copyTimer.current = setTimeout(() => setCopyButtonState("idle"), 1800);
-  }
-
-  function submitComment() {
-    if (!commentDraft.name || !commentDraft.text) return;
-    setCommentSubmitted(true);
-    setCommentDraft({ name: "", email: "", text: "" });
   }
 
   const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
@@ -168,38 +198,45 @@ export default function SermonInteractive({
       </div>
 
       <div className="mb-5 font-serif text-[24px] font-bold text-green-dark">Comments</div>
-      {commentSubmitted && (
+      {justCommented && (
         <div className="mb-5 rounded-xl bg-bg-alt px-5 py-4 text-[14px] text-text">
           Thanks — your comment has been submitted and is awaiting approval before it appears publicly.
         </div>
       )}
-      <div className="mb-7 flex flex-col gap-2.5">
+      <form action={commentFormAction} className="mb-7 flex flex-col gap-2.5">
         <input
+          name="name"
           placeholder="Your name"
-          value={commentDraft.name}
-          onChange={(e) => setCommentDraft((c) => ({ ...c, name: e.target.value }))}
           className="rounded-[10px] border border-border px-4 py-3 font-sans text-[14px]"
         />
+        {commentState.fieldErrors?.name && (
+          <p className="text-[13px] text-live">{commentState.fieldErrors.name}</p>
+        )}
         <input
+          name="email"
           placeholder="Email (optional, not published)"
-          value={commentDraft.email}
-          onChange={(e) => setCommentDraft((c) => ({ ...c, email: e.target.value }))}
           className="rounded-[10px] border border-border px-4 py-3 font-sans text-[14px]"
         />
         <textarea
+          name="text"
           placeholder="Write a comment..."
-          value={commentDraft.text}
-          onChange={(e) => setCommentDraft((c) => ({ ...c, text: e.target.value }))}
           rows={3}
           className="resize-y rounded-[10px] border border-border px-4 py-3 font-sans text-[14px]"
         />
+        {commentState.fieldErrors?.text && (
+          <p className="text-[13px] text-live">{commentState.fieldErrors.text}</p>
+        )}
+        {commentState.error && !commentState.fieldErrors && (
+          <p className="text-[13px] text-live">{commentState.error}</p>
+        )}
         <button
-          onClick={submitComment}
-          className="cursor-pointer self-start rounded-full bg-green px-[22px] py-2.5 text-[14px] text-bg"
+          type="submit"
+          disabled={isCommentPending}
+          className="cursor-pointer self-start rounded-full bg-green px-[22px] py-2.5 text-[14px] text-bg disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Post Comment
+          {isCommentPending ? "Posting…" : "Post Comment"}
         </button>
-      </div>
+      </form>
       <div className="flex flex-col gap-5">
         {comments.map((cm, i) => (
           <div key={i} className="border-t border-border pt-4">

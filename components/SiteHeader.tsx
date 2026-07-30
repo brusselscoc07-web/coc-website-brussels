@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { categories, navLinks, searchIndex } from "@/lib/data";
+import { categories, navLinks, type SearchItem } from "@/lib/data";
 
 function isActive(pathname: string, key: string) {
   if (key === "home") return pathname === "/" || pathname.startsWith("/contact") || pathname.startsWith("/join");
@@ -20,7 +20,19 @@ export default function SiteHeader() {
   const [resourcesOpen, setResourcesOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [searchIndex, setSearchIndex] = useState<SearchItem[] | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Lazy, one-time fetch — most visitors never open search, and this keeps
+  // the index reflecting DB content (sermons/events are admin-managed now)
+  // without every page load querying the DB just for the header.
+  useEffect(() => {
+    if (!searchOpen || searchIndex !== null) return;
+    fetch("/api/search-index")
+      .then((res) => res.json())
+      .then(setSearchIndex)
+      .catch(() => setSearchIndex([]));
+  }, [searchOpen, searchIndex]);
 
   const [prevPathname, setPrevPathname] = useState(pathname);
   if (pathname !== prevPathname) {
@@ -42,9 +54,9 @@ export default function SiteHeader() {
 
   const q = query.trim().toLowerCase();
   const results = useMemo(() => {
-    if (q.length <= 1) return [];
+    if (q.length <= 1 || !searchIndex) return [];
     return searchIndex.filter((item) => (item.title + item.snippet).toLowerCase().includes(q)).slice(0, 6);
-  }, [q]);
+  }, [q, searchIndex]);
 
   function goToResult(href: string) {
     setSearchOpen(false);
@@ -206,7 +218,10 @@ export default function SiteHeader() {
                   ))}
                 </div>
               )}
-              {q.length > 1 && results.length === 0 && (
+              {q.length > 1 && results.length === 0 && searchIndex === null && (
+                <div className="py-10 text-center text-[14px] text-text-muted">Searching…</div>
+              )}
+              {q.length > 1 && results.length === 0 && searchIndex !== null && (
                 <div className="py-10 text-center text-[14px] text-text-muted">
                   No results for &quot;{query}&quot; — try different words.
                 </div>

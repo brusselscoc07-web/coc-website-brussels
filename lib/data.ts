@@ -381,12 +381,6 @@ export const worshipItems = ["Prayer", "Singing", "Preaching & Teaching", "The L
   (label, i) => ({ num: String(i + 1).padStart(2, "0"), label })
 );
 
-export const thoughtForTheWeek = {
-  quote:
-    "“Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God — and the peace of God, which transcends all understanding, will guard your hearts and minds in Christ Jesus.”",
-  ref: "Philippians 4:6-7",
-};
-
 export function sermonImage(id: string, size = "600/400") {
   return `https://picsum.photos/seed/sermon-${id}/${size}`;
 }
@@ -407,7 +401,7 @@ export function mapHref() {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location.address)}`;
 }
 
-export function buildIcs(event: ChurchEvent) {
+export function buildIcs(event: { id: string; title: string; description: string; location: string }) {
   const uid = `${event.id}@cocbrussels`;
   const loc = event.location || location.address;
   const text = [
@@ -416,7 +410,7 @@ export function buildIcs(event: ChurchEvent) {
     "BEGIN:VEVENT",
     `UID:${uid}`,
     `SUMMARY:${event.title}`,
-    `DESCRIPTION:${event.desc}`,
+    `DESCRIPTION:${event.description}`,
     `LOCATION:${loc}`,
     "DTSTAMP:20260101T000000Z",
     "END:VEVENT",
@@ -443,11 +437,3 @@ export type SearchItem = {
   snippet: string;
   href: string;
 };
-
-export const searchIndex: SearchItem[] = [
-  ...sermons.map((s) => ({ type: "Blog" as const, title: s.title, snippet: s.excerpt, href: `/sermons/${s.id}` })),
-  ...events.map((e) => ({ type: "Events" as const, title: e.title, snippet: e.desc, href: `/events/${e.id}` })),
-  { type: "Pages" as const, title: "About Us", snippet: "Our statement of faith and church leadership.", href: "/about" },
-  { type: "Pages" as const, title: "Join Us", snippet: "What our worship consists of and how to visit.", href: "/join" },
-  { type: "Pages" as const, title: "Contact", snippet: "Reach out, visit, or call the church office.", href: "/contact" },
-];

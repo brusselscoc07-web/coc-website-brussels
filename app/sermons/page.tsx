@@ -1,6 +1,10 @@
+import { desc } from "drizzle-orm";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { categories, ctaLabel, sermonImage, sermons, typeColor } from "@/lib/data";
+import { categories, ctaLabel, type Sermon, typeColor } from "@/lib/data";
+import { getDb } from "@/lib/db";
+import { sermons as sermonsTable } from "@/lib/db/schema";
+import { formatDate } from "@/lib/format";
 
 export const metadata: Metadata = {
   title: "Resources — Church of Christ Brussels",
@@ -13,7 +17,10 @@ export default async function SermonsPage({
 }) {
   const { category: rawCategory } = await searchParams;
   const category = categories.includes(rawCategory as (typeof categories)[number]) ? rawCategory! : "All";
-  const filtered = category === "All" ? sermons : sermons.filter((s) => s.category === category);
+
+  const db = await getDb();
+  const allSermons = await db.select().from(sermonsTable).orderBy(desc(sermonsTable.date));
+  const filtered = category === "All" ? allSermons : allSermons.filter((s) => s.category === category);
 
   return (
     <div className="mx-auto max-w-6xl px-8 py-20">
@@ -44,8 +51,9 @@ export default async function SermonsPage({
 
       <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-7">
         {filtered.map((sm) => {
-          const isThought = sm.category === "Thought for the Week";
-          const color = typeColor(sm.category);
+          const category = sm.category as Sermon["category"];
+          const isThought = category === "Thought for the Week";
+          const color = typeColor(category);
           return (
             <Link
               key={sm.id}
@@ -55,7 +63,7 @@ export default async function SermonsPage({
               {!isThought && (
                 <div
                   className="relative h-[160px]"
-                  style={{ backgroundImage: `url(${sermonImage(sm.id)})`, backgroundSize: "cover", backgroundPosition: "center" }}
+                  style={{ backgroundImage: `url(${sm.imageUrl})`, backgroundSize: "cover", backgroundPosition: "center" }}
                 >
                   <span
                     className="absolute left-3.5 top-3.5 rounded-full px-3 py-1.5 text-[10.5px] font-semibold tracking-[1.5px] text-bg uppercase"
@@ -73,11 +81,11 @@ export default async function SermonsPage({
                 )}
                 <div className="mb-2 font-serif text-[20px] font-bold text-green-dark">{sm.title}</div>
                 <div className="mb-2.5 text-[12px] text-text-muted">
-                  {sm.date} · {sm.scripture}
+                  {formatDate(sm.date)} · {sm.scripture}
                 </div>
                 <div className="mb-4 text-[13.5px] leading-[1.6] text-text">{sm.excerpt}</div>
                 <div className="mt-auto text-[13px] font-semibold" style={{ color }}>
-                  {ctaLabel(sm.category)} →
+                  {ctaLabel(category)} →
                 </div>
               </div>
             </Link>

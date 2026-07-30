@@ -1,23 +1,57 @@
+import { and, asc, eq, sql } from "drizzle-orm";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import SermonInteractive from "@/components/SermonInteractive";
-import { mockComments, sermonImage, sermons } from "@/lib/data";
-
-export function generateStaticParams() {
-  return sermons.map((s) => ({ slug: s.id }));
-}
+import { getDb } from "@/lib/db";
+import { comments as commentsTable, reactions as reactionsTable, sermons as sermonsTable } from "@/lib/db/schema";
+import { formatDate } from "@/lib/format";
+import type { ReactionCounts, ReactionKind } from "@/lib/reaction-kinds";
+import { getVisitorId } from "@/lib/visitor";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const sermon = sermons.find((s) => s.id === slug);
+  const db = await getDb();
+  const [sermon] = await db.select().from(sermonsTable).where(eq(sermonsTable.id, slug));
   return { title: sermon ? `${sermon.title} — Church of Christ Brussels` : "Sermon — Church of Christ Brussels" };
 }
 
-export default async function SermonDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function SermonDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ commented?: string }>;
+}) {
   const { slug } = await params;
-  const sermon = sermons.find((s) => s.id === slug);
+  const { commented } = await searchParams;
+  const db = await getDb();
+  const [sermon] = await db.select().from(sermonsTable).where(eq(sermonsTable.id, slug));
   if (!sermon) notFound();
+
+  const approvedComments = await db
+    .select()
+    .from(commentsTable)
+    .where(and(eq(commentsTable.sermonId, sermon.id), eq(commentsTable.status, "approved")))
+    .orderBy(asc(commentsTable.createdAt));
+
+  const reactionRows = await db
+    .select({ kind: reactionsTable.kind, count: sql<number>`count(*)::int` })
+    .from(reactionsTable)
+    .where(eq(reactionsTable.sermonId, sermon.id))
+    .groupBy(reactionsTable.kind);
+  const initialReactions: ReactionCounts = { heart: 0, pray: 0, amen: 0 };
+  for (const row of reactionRows) initialReactions[row.kind as ReactionKind] = row.count;
+
+  const visitorId = await getVisitorId();
+  let initialMyReaction: ReactionKind | null = null;
+  if (visitorId) {
+    const [mine] = await db
+      .select()
+      .from(reactionsTable)
+      .where(and(eq(reactionsTable.sermonId, sermon.id), eq(reactionsTable.visitorId, visitorId)));
+    initialMyReaction = (mine?.kind as ReactionKind) ?? null;
+  }
 
   const videoUrl = sermon.videoUrl || "https://youtube.com";
 
@@ -31,7 +65,7 @@ export default async function SermonDetailPage({ params }: { params: Promise<{ s
       </Link>
       <div className="mb-3 mt-5 font-serif text-[38px] font-bold text-green-dark">{sermon.title}</div>
       <div className="mb-7 flex flex-wrap gap-3.5 text-[13px] text-text-muted">
-        <span>{sermon.date}</span>
+        <span>{formatDate(sermon.date)}</span>
         <span>·</span>
         <span>{sermon.preacher}</span>
         <span>·</span>
@@ -46,7 +80,7 @@ export default async function SermonDetailPage({ params }: { params: Promise<{ s
           className="relative mb-8 block overflow-hidden rounded-2xl no-underline"
           style={{
             aspectRatio: "16/9",
-            backgroundImage: `linear-gradient(180deg,rgba(10,12,10,0.15),rgba(10,12,10,0.6)),url(${sermonImage(sermon.id, "1000/560")})`,
+            backgroundImage: `linear-gradient(180deg,rgba(10,12,10,0.15),rgba(10,12,10,0.6)),url(${sermon.imageUrl})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
@@ -81,7 +115,14 @@ export default async function SermonDetailPage({ params }: { params: Promise<{ s
         ))}
       </div>
 
-      <SermonInteractive shareUrl={videoUrl} comments={mockComments[sermon.id] || []} />
+      <SermonInteractive
+        sermonId={sermon.id}
+        shareUrl={videoUrl}
+        justCommented={commented === "1"}
+        comments={approvedComments.map((c) => ({ name: c.name, date: formatDate(c.createdAt), text: c.text }))}
+        initialReactions={initialReactions}
+        initialMyReaction={initialMyReaction}
+      />
     </div>
   );
 }

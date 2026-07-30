@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import type { ChurchEvent } from "@/lib/data";
 
-export default function PastEventsToggle({ pastEvents }: { pastEvents: ChurchEvent[] }) {
+type PastEvent = { id: string; title: string; date: string };
+
+export default function PastEventsToggle({ pastEvents }: { pastEvents: PastEvent[] }) {
   const [show, setShow] = useState(false);
 
   return (

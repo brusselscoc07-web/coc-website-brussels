@@ -1,34 +1,22 @@
-"use client";
-
-import { useState } from "react";
 import Link from "next/link";
+import DualTimezoneTime from "@/components/DualTimezoneTime";
 import { location } from "@/lib/data";
 
-export default function LivestreamSection() {
-  const [live, setLive] = useState(false);
-
+// `live` is the real, admin-toggled status from the settings table (see
+// app/admin/(authenticated)/livestream/) — no more local preview-switch state.
+export default function LivestreamSection({
+  live,
+  nextServiceIso,
+}: {
+  live: boolean;
+  nextServiceIso: string | null;
+}) {
   return (
     <div className="mx-auto max-w-6xl px-8 pt-16">
       <div className="mb-7 flex flex-wrap items-end justify-between gap-3">
         <div>
           <div className="mb-2 text-[13px] tracking-[3px] text-gold uppercase">Worship With Us</div>
           <div className="font-serif text-[34px] font-bold text-green-dark">Livestream</div>
-        </div>
-        <div className="flex items-center gap-1.5 rounded-full border border-border bg-white p-1">
-          <button
-            onClick={() => setLive(false)}
-            className="cursor-pointer rounded-full px-4 py-2 text-[13px]"
-            style={{ background: !live ? "#2C4A3D" : "transparent", color: !live ? "#FAF5EA" : "#4A4438" }}
-          >
-            Offline preview
-          </button>
-          <button
-            onClick={() => setLive(true)}
-            className="cursor-pointer rounded-full px-4 py-2 text-[13px]"
-            style={{ background: live ? "#B3392C" : "transparent", color: live ? "#FFFFFF" : "#4A4438" }}
-          >
-            Live preview
-          </button>
         </div>
       </div>
 
@@ -69,7 +57,15 @@ export default function LivestreamSection() {
       ) : (
         <div className="rounded-[20px] border border-border bg-white p-12 text-center">
           <div className="mb-2.5 text-[15px] text-text-muted">We&apos;re not live right now</div>
-          <div className="mb-5 font-serif text-[26px] font-bold text-green-dark">Next service: Sunday, 12:30 PM</div>
+          <div className="mb-5 font-serif text-[26px] font-bold text-green-dark">
+            {nextServiceIso ? (
+              <>
+                Next service: <DualTimezoneTime iso={nextServiceIso} />
+              </>
+            ) : (
+              "Check our schedule for the next service"
+            )}
+          </div>
           <div className="flex flex-wrap justify-center gap-3.5">
             <Link href="/sermons" className="cursor-pointer rounded-full bg-green px-6 py-3 text-[14px] text-bg no-underline">
               Watch past sermons

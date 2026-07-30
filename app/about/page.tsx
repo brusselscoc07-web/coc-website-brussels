@@ -1,12 +1,28 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import DualTimezoneTime from "@/components/DualTimezoneTime";
 import { location, worshipItems } from "@/lib/data";
+import { nextWeeklyOccurrenceUTC, parseClockTime } from "@/lib/timezone";
 
 export const metadata: Metadata = {
   title: "About Us — Church of Christ Brussels",
 };
 
+// "Next occurrence" is computed from the current time — without this, a
+// statically-built page would freeze it at build time and it'd silently go
+// stale (still showing a "next Friday" that already passed).
+export const revalidate = 3600;
+
 export default function AboutPage() {
+  const now = new Date();
+  const worshipTimes = location.times.map((t) => {
+    const start = parseClockTime(t.time);
+    const nextOccurrenceIso = start
+      ? nextWeeklyOccurrenceUTC(t.day, start.hour, start.minute, now).toISOString()
+      : null;
+    return { ...t, nextOccurrenceIso };
+  });
+
   return (
     <div className="mx-auto max-w-[1000px] px-8 py-20">
       <div className="mb-14 text-center">
@@ -79,9 +95,16 @@ export default function AboutPage() {
             </div>
             <div>
               <div className="mb-1 text-[11px] tracking-[1.5px] text-gold uppercase">Times</div>
-              {location.times.map((t) => (
-                <div key={t.day} className="text-[15px] text-green-dark">
-                  {t.day}: {t.time}
+              {worshipTimes.map((t) => (
+                <div key={t.day} className="mb-1.5 last:mb-0">
+                  <div className="text-[15px] text-green-dark">
+                    {t.day}: {t.time} <span className="text-text-muted">Brussels time</span>
+                  </div>
+                  {t.nextOccurrenceIso && (
+                    <div className="text-[12.5px] text-text-muted">
+                      Starts <DualTimezoneTime iso={t.nextOccurrenceIso} />
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
