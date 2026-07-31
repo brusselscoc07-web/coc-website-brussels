@@ -22,7 +22,7 @@ export default async function Topbar({ title, subtitle }: { title: string; subti
 
   return (
     <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-[#DCE7F0] bg-white px-6 py-2.5 md:px-9">
-      <div>
+      <div className="min-w-0 flex-1">
         <div className="text-[16px] font-bold leading-tight text-[#16233A]">{title}</div>
         {subtitle && <div className="text-[11.5px] leading-tight text-[#7C93AA]">{subtitle}</div>}
       </div>

@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { saveHeroSlide, type HeroSlideFormState } from "@/app/admin/(authenticated)/hero/actions";
 import type { HeroSlide } from "@/lib/settings";
+import ImageFileInput from "./ImageFileInput";
 
 const initialState: HeroSlideFormState = {};
 const inputClass = "w-full rounded-[8px] border border-[#CBDBE8] px-3.5 py-3 font-sans text-[14px]";
@@ -17,10 +18,7 @@ export default function HeroSlideForm({ slide, onCancelHref }: { slide?: HeroSli
         <label className={labelClass} htmlFor="image">
           Slide image {slide?.imageUrl && "(leave empty to keep the current image)"}
         </label>
-        {slide?.imageUrl && (
-          <img src={slide.imageUrl} alt="" className="mb-2.5 h-[170px] w-full max-w-[320px] rounded-[10px] object-cover" />
-        )}
-        <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp" className={inputClass} />
+        <ImageFileInput id="image" name="image" existingImageUrl={slide?.imageUrl} />
         <p className="mt-1.5 text-[12px] text-[#7C93AA]">No image? A decorative gradient is used instead.</p>
       </div>
 

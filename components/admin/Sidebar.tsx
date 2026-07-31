@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 const ICONS: Record<string, React.ReactNode> = {
   dash: (
@@ -88,6 +89,15 @@ const NAV_ITEMS = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Close the mobile drawer on navigation — this layout persists across
+  // route changes within /admin, so without this the drawer would stay open.
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
+    setMobileOpen(false);
+  }
 
   function isActive(href: string, exact?: boolean) {
     return exact ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
@@ -95,12 +105,36 @@ export default function Sidebar() {
 
   return (
     <div className="w-full shrink-0 bg-[#16233A] md:fixed md:inset-y-0 md:left-0 md:h-screen md:w-[248px] md:overflow-y-auto">
-      <div className="px-5 pb-3.5 pt-4">
-        <div className="font-serif text-[20px] font-bold text-[#F4F5F9]">Church of Christ</div>
-        <div className="mt-[3px] text-[10.5px] uppercase tracking-[2.5px] text-[#93A9C2]">Brussels · Admin</div>
+      <div className="flex items-center justify-between px-5 py-3.5 md:block md:pb-3.5 md:pt-4">
+        <div>
+          <div className="font-serif text-[18px] font-bold text-[#F4F5F9] md:text-[20px]">Church of Christ</div>
+          <div className="mt-[3px] text-[10px] uppercase tracking-[2.5px] text-[#93A9C2] md:text-[10.5px]">
+            Brussels · Admin
+          </div>
+        </div>
+        <button
+          aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          aria-expanded={mobileOpen}
+          onClick={() => setMobileOpen((v) => !v)}
+          className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-[8px] text-[#F4F5F9] md:hidden"
+        >
+          {mobileOpen ? (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          )}
+        </button>
       </div>
 
-      <nav className="flex flex-col gap-0.5 border-t border-[#223756] px-3 pb-3 pt-2.5">
+      <nav
+        className={`flex-col gap-0.5 border-t border-[#223756] px-3 pb-3 pt-2.5 ${
+          mobileOpen ? "flex" : "hidden"
+        } md:flex`}
+      >
         {NAV_ITEMS.map((item) => {
           const active = isActive(item.href, "exact" in item ? item.exact : false);
           return (

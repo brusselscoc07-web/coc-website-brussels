@@ -6,6 +6,13 @@ import { redirect } from "next/navigation";
 import { requireAdminSession } from "@/lib/auth/require-admin";
 import { getDb } from "@/lib/db";
 import { comments } from "@/lib/db/schema";
+import { savedRedirectPath } from "@/lib/toast";
+
+const STATUS_MESSAGE: Record<string, string> = {
+  approved: "Comment approved",
+  rejected: "Comment rejected",
+  pending: "Moved back to pending",
+};
 
 // Redirects rather than returning state — see app/sermons/[slug]/actions.ts
 // for why a mutation on a page that also reads from the DB during render
@@ -18,7 +25,7 @@ async function setStatus(id: string, status: "pending" | "approved" | "rejected"
     .set({ status, reviewerId: admin.adminUserId, reviewedAt: new Date() })
     .where(eq(comments.id, id));
   revalidatePath(`/sermons/${sermonId}`);
-  redirect("/admin/comments");
+  redirect(savedRedirectPath("/admin/comments", STATUS_MESSAGE[status]));
 }
 
 export async function approveComment(id: string, sermonId: string) {

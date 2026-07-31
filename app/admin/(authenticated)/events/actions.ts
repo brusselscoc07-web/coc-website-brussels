@@ -7,6 +7,7 @@ import { requireAdminSession } from "@/lib/auth/require-admin";
 import { getDb } from "@/lib/db";
 import { events } from "@/lib/db/schema";
 import { eventDateTimeFromISO } from "@/lib/timezone";
+import { savedRedirectPath } from "@/lib/toast";
 import { uploadFormImage } from "@/lib/upload";
 import { eventSchema } from "@/lib/validation/event";
 
@@ -80,7 +81,7 @@ export async function createEvent(_prevState: EventFormState, formData: FormData
 
   revalidatePath("/events");
   revalidatePath("/");
-  redirect("/admin/events");
+  redirect(savedRedirectPath("/admin/events", "Event created"));
 }
 
 export async function updateEvent(
@@ -121,7 +122,7 @@ export async function updateEvent(
   revalidatePath("/events");
   revalidatePath(`/events/${id}`);
   revalidatePath("/");
-  redirect("/admin/events");
+  redirect(savedRedirectPath("/admin/events", "Event updated"));
 }
 
 export async function deleteEvent(id: string) {
@@ -130,5 +131,5 @@ export async function deleteEvent(id: string) {
   await db.delete(events).where(eq(events.id, id));
   revalidatePath("/events");
   revalidatePath("/");
-  redirect("/admin/events");
+  redirect(savedRedirectPath("/admin/events", "Event deleted"));
 }

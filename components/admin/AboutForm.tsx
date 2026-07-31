@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { saveAbout, type AboutFormState } from "@/app/admin/(authenticated)/about/actions";
 import type { AboutSetting } from "@/lib/settings";
+import { useToast } from "./ToastProvider";
 
 const inputClass = "w-full rounded-[8px] border border-[#CBD9E5] px-3.5 py-3 font-sans text-[14px]";
 const labelClass = "mb-1.5 block text-[12.5px] text-[#7C93AA]";
@@ -12,6 +13,7 @@ export default function AboutForm({ about }: { about: AboutSetting }) {
   const [draft, setDraft] = useState<AboutSetting>(about);
   const [state, setState] = useState<AboutFormState>({});
   const [isPending, startTransition] = useTransition();
+  const { showToast } = useToast();
 
   function field<K extends keyof AboutSetting>(key: K) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
@@ -33,7 +35,7 @@ export default function AboutForm({ about }: { about: AboutSetting }) {
     startTransition(async () => {
       const result = await saveAbout(draft);
       setState(result);
-      if (result.success) window.scrollTo({ top: 0, behavior: "smooth" });
+      if (result.success) showToast("About page saved");
     });
   }
 
@@ -58,7 +60,7 @@ export default function AboutForm({ about }: { about: AboutSetting }) {
         </div>
 
         <div className={cardClass}>
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
             <div className="text-[15px] font-semibold text-[#16233A]">Our Worship Consists Of</div>
             <button type="button" onClick={addWorshipItem} className="cursor-pointer text-[13px] text-[#2E90D9]">
               + Add Item

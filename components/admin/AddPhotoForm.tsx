@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { addPhoto, type AlbumFormState } from "@/app/admin/(authenticated)/albums/actions";
+import ImageFileInput from "./ImageFileInput";
 
 const initialState: AlbumFormState = {};
 
@@ -12,8 +13,8 @@ export default function AddPhotoForm({ albumId }: { albumId: string }) {
 
   return (
     <form action={formAction} className="flex flex-wrap items-end gap-3">
-      <div className="min-w-[200px] flex-1">
-        <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp" className={inputClass} />
+      <div className="min-w-[220px] flex-1">
+        <ImageFileInput id="image" name="image" />
       </div>
       <div className="min-w-[200px] flex-1">
         <input id="caption" name="caption" placeholder="Caption (optional)" className={inputClass} />

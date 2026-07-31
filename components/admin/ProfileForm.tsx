@@ -1,7 +1,8 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { changePassword, updateProfile, type ProfileFormState } from "@/app/admin/(authenticated)/profile/actions";
+import { useToast } from "./ToastProvider";
 
 const initialState: ProfileFormState = {};
 const inputClass = "w-full rounded-[8px] border border-[#CBDBE8] px-3.5 py-3 font-sans text-[14px]";
@@ -18,6 +19,17 @@ function initialsOf(name: string, email: string) {
 export default function ProfileForm({ name, email, role }: { name: string; email: string; role: string }) {
   const [profileState, profileAction, profilePending] = useActionState(updateProfile, initialState);
   const [passwordState, passwordAction, passwordPending] = useActionState(changePassword, initialState);
+  const { showToast } = useToast();
+
+  useEffect(() => {
+    if (profileState.success) showToast("Profile saved");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profileState]);
+
+  useEffect(() => {
+    if (passwordState.success) showToast("Password updated");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [passwordState]);
 
   return (
     <div className="max-w-3xl">

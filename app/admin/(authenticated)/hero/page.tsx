@@ -31,7 +31,7 @@ export default async function AdminHeroPage({
       <div className="max-w-5xl px-6 py-8 md:px-9">
         <div className="grid grid-cols-1 gap-[18px] lg:grid-cols-[1fr_360px]">
           <div>
-            <div className="mb-4 flex items-center justify-between">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
               <div className="text-[15px] font-semibold text-[#16233A]">Welcome Slides</div>
               {!formOpen && (
                 <Link

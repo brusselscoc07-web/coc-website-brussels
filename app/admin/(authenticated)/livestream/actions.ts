@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { requireAdminSession } from "@/lib/auth/require-admin";
 import { getDb } from "@/lib/db";
 import { settings } from "@/lib/db/schema";
+import { savedRedirectPath } from "@/lib/toast";
 
 export async function setLivestreamStatus(isLive: boolean) {
   const admin = await requireAdminSession();
@@ -18,5 +19,5 @@ export async function setLivestreamStatus(isLive: boolean) {
     .onConflictDoUpdate({ target: settings.key, set: { value, updatedAt: sql`now()` } });
 
   revalidatePath("/");
-  redirect("/admin/livestream");
+  redirect(savedRedirectPath("/admin/livestream", isLive ? "You're live" : "Livestream ended"));
 }

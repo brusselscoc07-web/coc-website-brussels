@@ -1,10 +1,10 @@
-import { desc, eq } from "drizzle-orm";
+import { asc, desc, eq, gte } from "drizzle-orm";
 import Link from "next/link";
 import HeroCarousel from "@/components/HeroCarousel";
 import LivestreamSection from "@/components/LivestreamSection";
 import SocialLinksGrid from "@/components/SocialLinksGrid";
 import { getDb } from "@/lib/db";
-import { sermons as sermonsTable } from "@/lib/db/schema";
+import { events as eventsTable, sermons as sermonsTable } from "@/lib/db/schema";
 import { formatDate } from "@/lib/format";
 import { getAboutContent, getHeroContent, getHomeHighlights, getLivestreamStatus, getSiteSettings } from "@/lib/settings";
 import { to24Hour } from "@/lib/time";
@@ -40,10 +40,12 @@ export default async function HomePage() {
     return fallback;
   }
 
-  const [latestSermon, latestThought, latestTeaching] = await Promise.all([
+  const todayUTC = new Date().toISOString().slice(0, 10);
+  const [latestSermon, latestThought, latestTeaching, [nextEvent]] = await Promise.all([
     pickResource("Sermon", highlights.sermonId),
     pickResource("Thought for the Week", highlights.thoughtId),
     pickResource("Bible Teachings", highlights.teachingId),
+    db.select().from(eventsTable).where(gte(eventsTable.eventDate, todayUTC)).orderBy(asc(eventsTable.eventDate)).limit(1),
   ]);
 
   const livestream = await getLivestreamStatus();
@@ -85,6 +87,26 @@ export default async function HomePage() {
               <div className="mb-4 text-[14px] leading-[1.6] text-text">{latestSermon.excerpt}</div>
               <div className="inline-block rounded-full bg-green px-5 py-2.5 text-[14px] font-semibold text-bg">
                 Watch / Read More →
+              </div>
+            </div>
+          </Link>
+        )}
+
+        {nextEvent && (
+          <Link
+            href={`/events/${nextEvent.id}`}
+            className="overflow-hidden rounded-[20px] border border-border bg-white no-underline"
+          >
+            <div className="h-[180px]" style={{ background: "linear-gradient(135deg,#C79A46,#8f6f2c)" }} />
+            <div className="p-[26px]">
+              <div className="mb-2 text-[12px] tracking-[2px] text-green uppercase">Next Event</div>
+              <div className="mb-2 font-serif text-[24px] font-bold text-green-dark">{nextEvent.title}</div>
+              <div className="mb-3.5 text-[13px] text-text-muted">
+                {nextEvent.dateLabel || formatDate(nextEvent.eventDate)}
+              </div>
+              <div className="mb-4 text-[14px] leading-[1.6] text-text">{nextEvent.description}</div>
+              <div className="inline-block rounded-full bg-green px-5 py-2.5 text-[14px] font-semibold text-bg">
+                See all events →
               </div>
             </div>
           </Link>

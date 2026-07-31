@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdminSession } from "@/lib/auth/require-admin";
 import { getHeroContent, upsertSetting } from "@/lib/settings";
+import { savedRedirectPath } from "@/lib/toast";
 import { uploadFormImage } from "@/lib/upload";
 import { heroSlideSchema } from "@/lib/validation/hero";
 
@@ -63,7 +64,7 @@ export async function saveHeroSlide(
 
   await upsertSetting("hero", { slides });
   revalidatePath("/");
-  redirect("/admin/hero");
+  redirect(savedRedirectPath("/admin/hero", slideId ? "Slide updated" : "Slide created"));
 }
 
 export async function deleteHeroSlide(slideId: string) {
@@ -72,7 +73,7 @@ export async function deleteHeroSlide(slideId: string) {
   const slides = current.slides.filter((s) => s.id !== slideId);
   await upsertSetting("hero", { slides });
   revalidatePath("/");
-  redirect("/admin/hero");
+  redirect(savedRedirectPath("/admin/hero", "Slide deleted"));
 }
 
 // Picks exactly which Sermon / Thought for the Week / Bible Teachings entry
@@ -94,5 +95,5 @@ export async function saveHomeHighlights(_prevState: HighlightsFormState, formDa
   });
 
   revalidatePath("/");
-  redirect("/admin/hero");
+  redirect(savedRedirectPath("/admin/hero", "Highlights saved"));
 }

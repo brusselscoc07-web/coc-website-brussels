@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { requireAdminSession } from "@/lib/auth/require-admin";
 import { getDb } from "@/lib/db";
 import { sermons } from "@/lib/db/schema";
+import { savedRedirectPath } from "@/lib/toast";
 import { uploadFormImage } from "@/lib/upload";
 import { sermonSchema } from "@/lib/validation/sermon";
 
@@ -94,7 +95,7 @@ export async function createSermon(_prevState: SermonFormState, formData: FormDa
 
   revalidatePath("/sermons");
   revalidatePath("/");
-  redirect("/admin/sermons");
+  redirect(savedRedirectPath("/admin/sermons", "Resource created"));
 }
 
 // The slug is the primary key and comments/reactions cascade-delete off it, so
@@ -139,7 +140,7 @@ export async function updateSermon(
   revalidatePath("/sermons");
   revalidatePath(`/sermons/${id}`);
   revalidatePath("/");
-  redirect("/admin/sermons");
+  redirect(savedRedirectPath("/admin/sermons", "Resource updated"));
 }
 
 export async function deleteSermon(id: string) {
@@ -148,5 +149,5 @@ export async function deleteSermon(id: string) {
   await db.delete(sermons).where(eq(sermons.id, id));
   revalidatePath("/sermons");
   revalidatePath("/");
-  redirect("/admin/sermons");
+  redirect(savedRedirectPath("/admin/sermons", "Resource deleted"));
 }

@@ -1,8 +1,9 @@
 "use client";
 
 import { useActionState } from "react";
-import { SERMON_CATEGORIES } from "@/lib/validation/sermon";
 import { createSermon, updateSermon, type SermonFormState } from "@/app/admin/(authenticated)/sermons/actions";
+import { SERMON_CATEGORIES } from "@/lib/validation/sermon";
+import ImageFileInput from "./ImageFileInput";
 
 type SermonRow = {
   id: string;
@@ -131,10 +132,7 @@ export default function SermonForm({ sermon }: { sermon?: SermonRow }) {
         <label className={labelClass} htmlFor="image">
           Image {sermon?.imageUrl && "(leave empty to keep the current image)"}
         </label>
-        {sermon?.imageUrl && (
-          <img src={sermon.imageUrl} alt="" className="mb-2.5 h-32 w-52 rounded-[10px] object-cover" />
-        )}
-        <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp" className={inputClass} />
+        <ImageFileInput id="image" name="image" existingImageUrl={sermon?.imageUrl} />
       </div>
 
       {state.error && <p className="text-[14px] text-[#C13B3B]">{state.error}</p>}

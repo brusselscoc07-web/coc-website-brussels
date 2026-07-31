@@ -7,6 +7,7 @@ import type { SiteSetting } from "@/lib/settings";
 import { DEFAULT_TIME, type TimeValue } from "@/lib/time";
 import { CHURCH_TIMEZONES } from "@/lib/timezone";
 import TimePicker from "./TimePicker";
+import { useToast } from "./ToastProvider";
 
 const inputClass = "w-full rounded-[8px] border border-[#CBDBE8] px-3.5 py-3 font-sans text-[14px]";
 const selectClass = "w-full rounded-[8px] border border-[#CBDBE8] bg-white px-3.5 py-3 font-sans text-[14px]";
@@ -22,6 +23,7 @@ export default function SiteSettingsForm({ site }: { site: SiteSetting }) {
   const [draft, setDraft] = useState<SiteSetting>(site);
   const [state, setState] = useState<SiteSettingsFormState>({});
   const [isPending, startTransition] = useTransition();
+  const { showToast } = useToast();
 
   function field<K extends keyof SiteSetting>(key: K) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
@@ -59,7 +61,7 @@ export default function SiteSettingsForm({ site }: { site: SiteSetting }) {
     startTransition(async () => {
       const result = await saveSiteSettings(draft);
       setState(result);
-      if (result.success) window.scrollTo({ top: 0, behavior: "smooth" });
+      if (result.success) showToast("Site settings saved");
     });
   }
 
@@ -104,7 +106,7 @@ export default function SiteSettingsForm({ site }: { site: SiteSetting }) {
         </div>
 
         <div className={cardClass}>
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
             <div className="text-[15px] font-semibold text-[#16233A]">Service Times</div>
             <button type="button" onClick={addServiceTime} className="cursor-pointer text-[13px] text-[#2E90D9]">
               + Add Time
@@ -135,7 +137,7 @@ export default function SiteSettingsForm({ site }: { site: SiteSetting }) {
                   </div>
                   {t.end ? (
                     <div>
-                      <div className="mb-1 flex items-center justify-between gap-3 text-[11.5px] text-[#7C93AA]">
+                      <div className="mb-1 flex flex-wrap items-center justify-between gap-2 text-[11.5px] text-[#7C93AA]">
                         <span>Ends</span>
                         <button
                           type="button"

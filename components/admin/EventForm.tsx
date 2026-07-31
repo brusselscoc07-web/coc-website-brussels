@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import { createEvent, updateEvent, type EventFormState } from "@/app/admin/(authenticated)/events/actions";
 import { DEFAULT_TIME, formatTime12h, from24Hour, type TimeValue } from "@/lib/time";
 import { parseClockTime } from "@/lib/timezone";
+import ImageFileInput from "./ImageFileInput";
 import TimePicker from "./TimePicker";
 
 type EventRow = {
@@ -83,7 +84,7 @@ export default function EventForm({ event }: { event?: EventRow }) {
       </div>
 
       <div>
-        <div className="mb-1.5 flex items-center justify-between">
+        <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
           <div className={labelClass.replace("mb-1.5", "mb-0")}>Time</div>
           <div className="flex gap-1 rounded-full border border-[#DCE7F0] bg-white p-0.5">
             {(["specific", "custom"] as const).map((m) => (
@@ -130,10 +131,7 @@ export default function EventForm({ event }: { event?: EventRow }) {
         <label className={labelClass} htmlFor="image">
           Image {event?.imageUrl && "(leave empty to keep the current image)"}
         </label>
-        {event?.imageUrl && (
-          <img src={event.imageUrl} alt="" className="mb-2.5 h-32 w-52 rounded-[10px] object-cover" />
-        )}
-        <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp" className={inputClass} />
+        <ImageFileInput id="image" name="image" existingImageUrl={event?.imageUrl} />
       </div>
 
       {state.error && <p className="text-[14px] text-[#C13B3B]">{state.error}</p>}

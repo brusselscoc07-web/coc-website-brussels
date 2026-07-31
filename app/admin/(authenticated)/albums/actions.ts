@@ -7,6 +7,7 @@ import { requireAdminSession } from "@/lib/auth/require-admin";
 import { getDb } from "@/lib/db";
 import { albums, photos } from "@/lib/db/schema";
 import { deleteImage } from "@/lib/storage";
+import { savedRedirectPath } from "@/lib/toast";
 import { uploadFormImage } from "@/lib/upload";
 import { albumSchema, photoSchema } from "@/lib/validation/album";
 
@@ -47,7 +48,7 @@ export async function createAlbum(_prevState: AlbumFormState, formData: FormData
 
   await db.insert(albums).values(parsed.data);
   revalidatePath("/gallery");
-  redirect(`/admin/albums/${parsed.data.id}`);
+  redirect(savedRedirectPath(`/admin/albums/${parsed.data.id}`, "Album created"));
 }
 
 export async function updateAlbum(
@@ -73,7 +74,11 @@ export async function updateAlbum(
 
   revalidatePath("/gallery");
   revalidatePath(`/gallery/${id}`);
-  redirect(`/admin/albums/${id}`);
+  // Unlike createAlbum (which lands on the manage page so photos can be added
+  // right away) and addPhoto/deletePhoto (which stay on the manage page so
+  // multiple photos can be added in one sitting), saving the album's own
+  // details is the "I'm done" action — back to the Gallery list.
+  redirect(savedRedirectPath("/admin/albums", "Album saved"));
 }
 
 export async function deleteAlbum(id: string) {
@@ -85,7 +90,7 @@ export async function deleteAlbum(id: string) {
   // never worth failing the delete over.
   await Promise.all(albumPhotos.map((ph) => deleteImage(ph.url.split("/").pop()!).catch(() => {})));
   revalidatePath("/gallery");
-  redirect("/admin/albums");
+  redirect(savedRedirectPath("/admin/albums", "Album deleted"));
 }
 
 export async function addPhoto(albumId: string, _prevState: AlbumFormState, formData: FormData): Promise<AlbumFormState> {
@@ -115,7 +120,7 @@ export async function addPhoto(albumId: string, _prevState: AlbumFormState, form
 
   revalidatePath(`/gallery/${albumId}`);
   revalidatePath("/gallery");
-  redirect(`/admin/albums/${albumId}`);
+  redirect(savedRedirectPath(`/admin/albums/${albumId}`, "Photo added"));
 }
 
 export async function deletePhoto(albumId: string, photoId: string) {
@@ -130,5 +135,5 @@ export async function deletePhoto(albumId: string, photoId: string) {
   }
   revalidatePath(`/gallery/${albumId}`);
   revalidatePath("/gallery");
-  redirect(`/admin/albums/${albumId}`);
+  redirect(savedRedirectPath(`/admin/albums/${albumId}`, "Photo deleted"));
 }
