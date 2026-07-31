@@ -151,27 +151,33 @@ export default function SiteHeader() {
       </div>
 
       {mobileMenuOpen && (
-        <div className="flex flex-col gap-4 border-t border-border bg-bg px-8 pb-6 pt-[18px] min-[880px]:hidden">
-          {navLinks.map((item) => {
-            const active = isActive(pathname, item.key);
-            return (
-              <Link
-                key={item.key}
-                href={item.href}
-                className="text-[16px] no-underline"
-                style={{ color: active ? "#2C4A3D" : "#201F1B", fontWeight: active ? 700 : 500 }}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
-          <Link
-            href="/join"
-            className="cursor-pointer self-start rounded-full bg-green px-[22px] py-2.5 text-[14px] tracking-[0.4px] text-bg no-underline"
-          >
-            Join Us
-          </Link>
-        </div>
+        <>
+          <div
+            onClick={() => setMobileMenuOpen(false)}
+            className="fixed inset-0 z-30 bg-black/30 min-[880px]:hidden"
+          />
+          <div className="absolute inset-x-0 top-full z-40 flex max-h-[calc(100vh-72px)] flex-col gap-4 overflow-y-auto border-t border-border bg-bg px-8 pb-6 pt-[18px] shadow-[0_20px_40px_rgba(20,22,18,0.18)] min-[880px]:hidden">
+            {navLinks.map((item) => {
+              const active = isActive(pathname, item.key);
+              return (
+                <Link
+                  key={item.key}
+                  href={item.href}
+                  className="text-[16px] no-underline"
+                  style={{ color: active ? "#2C4A3D" : "#201F1B", fontWeight: active ? 700 : 500 }}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+            <Link
+              href="/join"
+              className="cursor-pointer self-start rounded-full bg-green px-[22px] py-2.5 text-[14px] tracking-[0.4px] text-bg no-underline"
+            >
+              Join Us
+            </Link>
+          </div>
+        </>
       )}
 
       {searchOpen && (

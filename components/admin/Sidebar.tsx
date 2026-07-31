@@ -104,7 +104,7 @@ export default function Sidebar() {
   }
 
   return (
-    <div className="w-full shrink-0 bg-[#16233A] md:fixed md:inset-y-0 md:left-0 md:h-screen md:w-[248px] md:overflow-y-auto">
+    <div className="relative w-full shrink-0 bg-[#16233A] md:fixed md:inset-y-0 md:left-0 md:h-screen md:w-[248px] md:overflow-y-auto">
       <div className="flex items-center justify-between px-5 py-3.5 md:block md:pb-3.5 md:pt-4">
         <div>
           <div className="font-serif text-[18px] font-bold text-[#F4F5F9] md:text-[20px]">Church of Christ</div>
@@ -130,10 +130,17 @@ export default function Sidebar() {
         </button>
       </div>
 
+      {mobileOpen && (
+        <div
+          onClick={() => setMobileOpen(false)}
+          className="fixed inset-0 z-30 bg-black/40 md:hidden"
+        />
+      )}
+
       <nav
-        className={`flex-col gap-0.5 border-t border-[#223756] px-3 pb-3 pt-2.5 ${
+        className={`absolute inset-x-0 top-full z-40 max-h-[calc(100vh-64px)] flex-col gap-0.5 overflow-y-auto border-t border-[#223756] bg-[#16233A] px-3 pb-3 pt-2.5 shadow-[0_20px_40px_rgba(10,16,28,0.35)] ${
           mobileOpen ? "flex" : "hidden"
-        } md:flex`}
+        } md:static md:flex md:max-h-none md:shadow-none`}
       >
         {NAV_ITEMS.map((item) => {
           const active = isActive(item.href, "exact" in item ? item.exact : false);
