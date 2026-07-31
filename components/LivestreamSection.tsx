@@ -1,15 +1,18 @@
 import Link from "next/link";
 import DualTimezoneTime from "@/components/DualTimezoneTime";
-import { location } from "@/lib/data";
 
 // `live` is the real, admin-toggled status from the settings table (see
 // app/admin/(authenticated)/livestream/) — no more local preview-switch state.
 export default function LivestreamSection({
   live,
   nextServiceIso,
+  zoomLink,
+  streamingLocation,
 }: {
   live: boolean;
   nextServiceIso: string | null;
+  zoomLink?: string;
+  streamingLocation?: string;
 }) {
   return (
     <div className="mx-auto max-w-6xl px-8 pt-16">
@@ -22,7 +25,7 @@ export default function LivestreamSection({
 
       {live ? (
         <a
-          href={location.zoomLink}
+          href={zoomLink || "#"}
           target="_blank"
           rel="noreferrer"
           className="relative block overflow-hidden rounded-[20px] no-underline"
@@ -41,7 +44,9 @@ export default function LivestreamSection({
           <div className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[rgba(37,101,200,0.85)]">
             <span className="ml-1.5 inline-block border-y-[14px] border-l-[22px] border-y-transparent border-l-white" />
           </div>
-          <div className="absolute bottom-5 left-5 text-[13px] text-gold-light">Streaming from {location.place}</div>
+          {streamingLocation && (
+            <div className="absolute bottom-5 left-5 text-[13px] text-gold-light">Streaming from {streamingLocation}</div>
+          )}
           <div className="absolute bottom-4 right-4 flex items-center gap-2 rounded-full bg-black/60 px-4 py-2 text-[13px] text-white">
             <svg width="16" height="16" viewBox="0 0 24 24">
               <rect width="24" height="24" rx="6" fill="#2D8CFF" />

@@ -1,14 +1,14 @@
-import { asc, desc, eq, gte } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import Link from "next/link";
 import HeroCarousel from "@/components/HeroCarousel";
 import LivestreamSection from "@/components/LivestreamSection";
 import SocialLinksGrid from "@/components/SocialLinksGrid";
-import { location } from "@/lib/data";
 import { getDb } from "@/lib/db";
-import { events as eventsTable, sermons as sermonsTable } from "@/lib/db/schema";
+import { sermons as sermonsTable } from "@/lib/db/schema";
 import { formatDate } from "@/lib/format";
-import { getLivestreamStatus } from "@/lib/settings";
-import { nextWeeklyOccurrenceUTC, parseClockTime } from "@/lib/timezone";
+import { getAboutContent, getHeroContent, getHomeHighlights, getLivestreamStatus, getSiteSettings } from "@/lib/settings";
+import { to24Hour } from "@/lib/time";
+import { nextWeeklyOccurrenceUTC } from "@/lib/timezone";
 
 // Queries the DB and depends on the current time, so it must render fresh per
 // request — static generation would freeze both at build time. This also
@@ -21,75 +21,70 @@ export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const db = await getDb();
-  const [latestSermon] = await db.select().from(sermonsTable).orderBy(desc(sermonsTable.date)).limit(1);
-  const todayUTC = new Date().toISOString().slice(0, 10);
-  const [nextEvent] = await db
-    .select()
-    .from(eventsTable)
-    .where(gte(eventsTable.eventDate, todayUTC))
-    .orderBy(asc(eventsTable.eventDate))
-    .limit(1);
+  const highlights = await getHomeHighlights();
 
-  const [latestThought] = await db
-    .select()
-    .from(sermonsTable)
-    .where(eq(sermonsTable.category, "Thought for the Week"))
-    .orderBy(desc(sermonsTable.date))
-    .limit(1);
+  // Each of the 3 homepage cards prefers the admin's manual pick (see
+  // /admin/hero), falling back to the most recent entry in that category —
+  // the original always-automatic behavior.
+  async function pickResource(category: string, pickedId: string | null) {
+    if (pickedId) {
+      const [picked] = await db.select().from(sermonsTable).where(eq(sermonsTable.id, pickedId));
+      if (picked) return picked;
+    }
+    const [fallback] = await db
+      .select()
+      .from(sermonsTable)
+      .where(eq(sermonsTable.category, category))
+      .orderBy(desc(sermonsTable.date))
+      .limit(1);
+    return fallback;
+  }
+
+  const [latestSermon, latestThought, latestTeaching] = await Promise.all([
+    pickResource("Sermon", highlights.sermonId),
+    pickResource("Thought for the Week", highlights.thoughtId),
+    pickResource("Bible Teachings", highlights.teachingId),
+  ]);
 
   const livestream = await getLivestreamStatus();
+  const [about, site, hero] = await Promise.all([getAboutContent(), getSiteSettings(), getHeroContent()]);
 
   const now = new Date();
-  const nextServiceOccurrences = location.times
-    .map((t) => {
-      const start = parseClockTime(t.time);
-      return start ? nextWeeklyOccurrenceUTC(t.day, start.hour, start.minute, now) : null;
-    })
-    .filter((d): d is Date => d !== null);
+  const nextServiceOccurrences = site.serviceTimes.map((t) => {
+    const start24 = to24Hour(t.start);
+    return nextWeeklyOccurrenceUTC(t.day, start24.hour, start24.minute, now, site.timezone);
+  });
   const nextService = nextServiceOccurrences.length
     ? nextServiceOccurrences.reduce((soonest, d) => (d < soonest ? d : soonest))
     : null;
 
   return (
     <div>
-      <HeroCarousel />
-      <LivestreamSection live={livestream.isLive} nextServiceIso={nextService?.toISOString() ?? null} />
+      <HeroCarousel slides={hero.slides} />
+      <LivestreamSection
+        live={livestream.isLive}
+        nextServiceIso={nextService?.toISOString() ?? null}
+        zoomLink={about.zoomLink}
+        streamingLocation={about.worshipPlace}
+      />
 
       <div className="mx-auto grid max-w-6xl grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-7 px-8 pb-16 pt-14">
-        <Link
-          href={`/sermons/${latestSermon.id}`}
-          className="overflow-hidden rounded-[20px] border border-border bg-white no-underline"
-        >
-          <div
-            className="h-[180px]"
-            style={{ backgroundImage: `url(${latestSermon.imageUrl})`, backgroundSize: "cover", backgroundPosition: "center" }}
-          />
-          <div className="p-[26px]">
-            <div className="mb-2 text-[12px] tracking-[2px] text-gold uppercase">Latest Sermon</div>
-            <div className="mb-2 font-serif text-[24px] font-bold text-green-dark">{latestSermon.title}</div>
-            <div className="mb-3.5 text-[13px] text-text-muted">{formatDate(latestSermon.date)}</div>
-            <div className="mb-4 text-[14px] leading-[1.6] text-text">{latestSermon.excerpt}</div>
-            <div className="inline-block rounded-full bg-green px-5 py-2.5 text-[14px] font-semibold text-bg">
-              Watch / Read More →
-            </div>
-          </div>
-        </Link>
-
-        {nextEvent && (
+        {latestSermon && (
           <Link
-            href={`/events/${nextEvent.id}`}
+            href={`/sermons/${latestSermon.id}`}
             className="overflow-hidden rounded-[20px] border border-border bg-white no-underline"
           >
-            <div className="h-[180px]" style={{ background: "linear-gradient(135deg,#C79A46,#8f6f2c)" }} />
+            <div
+              className="h-[180px]"
+              style={{ backgroundImage: `url(${latestSermon.imageUrl})`, backgroundSize: "cover", backgroundPosition: "center" }}
+            />
             <div className="p-[26px]">
-              <div className="mb-2 text-[12px] tracking-[2px] text-green uppercase">Next Event</div>
-              <div className="mb-2 font-serif text-[24px] font-bold text-green-dark">{nextEvent.title}</div>
-              <div className="mb-3.5 text-[13px] text-text-muted">
-                {nextEvent.dateLabel || formatDate(nextEvent.eventDate)}
-              </div>
-              <div className="mb-4 text-[14px] leading-[1.6] text-text">{nextEvent.description}</div>
+              <div className="mb-2 text-[12px] tracking-[2px] text-gold uppercase">Latest Sermon</div>
+              <div className="mb-2 font-serif text-[24px] font-bold text-green-dark">{latestSermon.title}</div>
+              <div className="mb-3.5 text-[13px] text-text-muted">{formatDate(latestSermon.date)}</div>
+              <div className="mb-4 text-[14px] leading-[1.6] text-text">{latestSermon.excerpt}</div>
               <div className="inline-block rounded-full bg-green px-5 py-2.5 text-[14px] font-semibold text-bg">
-                See all events →
+                Watch / Read More →
               </div>
             </div>
           </Link>
@@ -108,6 +103,23 @@ export default async function HomePage() {
             <div className="mb-4 text-[14px] leading-[1.6] text-text">{latestThought.excerpt}</div>
             <div className="mt-auto inline-block w-fit rounded-full bg-green px-5 py-2.5 text-[14px] font-semibold text-bg">
               Read More →
+            </div>
+          </Link>
+        )}
+
+        {latestTeaching && (
+          <Link
+            href={`/sermons/${latestTeaching.id}`}
+            className="flex flex-col rounded-[20px] border border-border bg-white p-[26px] no-underline"
+          >
+            <div className="mb-2 text-[12px] tracking-[2px] text-green uppercase">Bible Teachings</div>
+            <div className="mb-2 font-serif text-[20px] font-bold text-green-dark">{latestTeaching.title}</div>
+            {latestTeaching.scripture && (
+              <div className="mb-3.5 text-[13px] text-text-muted">{latestTeaching.scripture}</div>
+            )}
+            <div className="mb-4 text-[14px] leading-[1.6] text-text">{latestTeaching.excerpt}</div>
+            <div className="mt-auto inline-block w-fit rounded-full bg-green px-5 py-2.5 text-[14px] font-semibold text-bg">
+              Read the study →
             </div>
           </Link>
         )}

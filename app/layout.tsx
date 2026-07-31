@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Work_Sans } from "next/font/google";
 import "./globals.css";
+import ConditionalChrome from "@/components/ConditionalChrome";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 
@@ -30,9 +31,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${cormorant.variable} ${workSans.variable}`}>
       <body className="flex min-h-screen flex-col bg-bg font-sans text-ink antialiased">
-        <SiteHeader />
-        <main className="flex-1">{children}</main>
-        <SiteFooter />
+        <ConditionalChrome header={<SiteHeader />} footer={<SiteFooter />}>
+          <main className="flex-1">{children}</main>
+        </ConditionalChrome>
       </body>
     </html>
   );

@@ -1,6 +1,7 @@
 import { desc } from "drizzle-orm";
 import Link from "next/link";
 import ConfirmSubmitButton from "@/components/admin/ConfirmSubmitButton";
+import Topbar from "@/components/admin/Topbar";
 import { categories } from "@/lib/data";
 import { getDb } from "@/lib/db";
 import { sermons as sermonsTable } from "@/lib/db/schema";
@@ -26,74 +27,74 @@ export default async function AdminSermonsPage({
   const filtered = category === "All" ? allSermons : allSermons.filter((s) => s.category === category);
 
   return (
-    <div className="mx-auto max-w-4xl px-8 py-14">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <div className="font-serif text-[32px] font-bold text-green-dark">Resources</div>
-          <p className="mt-1 text-[13px] text-text-muted">
-            Sermons, Thought for the Week posts, and Bible Teachings studies all live here, distinguished by category.
-          </p>
-        </div>
-        <Link
-          href="/admin/sermons/new"
-          className="cursor-pointer whitespace-nowrap rounded-full bg-green px-6 py-3 text-[14px] font-semibold text-bg no-underline"
-        >
-          + New Resource
-        </Link>
-      </div>
-
-      <div className="mb-6 flex flex-wrap gap-2.5">
-        {categories.map((c) => {
-          const active = category === c;
-          return (
-            <Link
-              key={c}
-              href={c === "All" ? "/admin/sermons" : `/admin/sermons?category=${encodeURIComponent(c)}`}
-              className="cursor-pointer rounded-full border px-[18px] py-2 text-[13px] no-underline"
-              style={{
-                borderColor: active ? "#2C4A3D" : "#E7DFCE",
-                background: active ? "#2C4A3D" : "#FFFFFF",
-                color: active ? "#FAF5EA" : "#4A4438",
-              }}
-            >
-              {c}
-            </Link>
-          );
-        })}
-      </div>
-
-      <div className="flex flex-col gap-3">
-        {filtered.map((s) => (
-          <div
-            key={s.id}
-            className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border bg-white p-5"
+    <div>
+      <Topbar
+        title="Resources"
+        subtitle="Sermons, Thought for the Week posts, and Bible Teachings studies all live here, distinguished by category."
+      />
+      <div className="mx-auto max-w-4xl px-8 py-8">
+        <div className="mb-6 flex flex-wrap items-center justify-end gap-4">
+          <Link
+            href="/admin/sermons/new"
+            className="cursor-pointer whitespace-nowrap rounded-[10px] bg-[#2E90D9] px-5 py-2.5 text-[13.5px] font-semibold text-white no-underline"
           >
-            <div>
-              <div className="font-serif text-[18px] font-bold text-green-dark">{s.title}</div>
-              <div className="text-[13px] text-text-muted">
-                {formatDate(s.date)} ·{" "}
-                <span className="rounded-full bg-bg-alt px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.5px] text-green">
-                  {s.category}
-                </span>
+            + New Resource
+          </Link>
+        </div>
+
+        <div className="mb-6 flex flex-wrap gap-2.5">
+          {categories.map((c) => {
+            const active = category === c;
+            return (
+              <Link
+                key={c}
+                href={c === "All" ? "/admin/sermons" : `/admin/sermons?category=${encodeURIComponent(c)}`}
+                className="cursor-pointer rounded-full border px-[18px] py-2 text-[13px] no-underline"
+                style={{
+                  borderColor: active ? "#2E90D9" : "#DCE7F0",
+                  background: active ? "#2E90D9" : "#FFFFFF",
+                  color: active ? "#FFFFFF" : "#4F6478",
+                }}
+              >
+                {c}
+              </Link>
+            );
+          })}
+        </div>
+
+        <div className="flex flex-col gap-3">
+          {filtered.map((s) => (
+            <div
+              key={s.id}
+              className="flex flex-wrap items-center justify-between gap-4 rounded-[14px] border border-[#DCE7F0] bg-white p-4"
+            >
+              <div>
+                <div className="text-[15px] font-semibold text-[#16233A]">{s.title}</div>
+                <div className="text-[13px] text-[#7C93AA]">
+                  {formatDate(s.date)} ·{" "}
+                  <span className="rounded-full bg-[#F2F7FB] px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.5px] text-[#2E90D9]">
+                    {s.category}
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <Link href={`/admin/sermons/${s.id}`} className="text-[13px] font-semibold text-[#2E90D9] no-underline">
+                  Edit
+                </Link>
+                <form action={deleteSermon.bind(null, s.id)}>
+                  <ConfirmSubmitButton confirmText={`Delete "${s.title}"? This can't be undone.`}>
+                    Delete
+                  </ConfirmSubmitButton>
+                </form>
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              <Link href={`/admin/sermons/${s.id}`} className="text-[13px] font-semibold text-green no-underline">
-                Edit
-              </Link>
-              <form action={deleteSermon.bind(null, s.id)}>
-                <ConfirmSubmitButton confirmText={`Delete "${s.title}"? This can't be undone.`}>
-                  Delete
-                </ConfirmSubmitButton>
-              </form>
+          ))}
+          {filtered.length === 0 && (
+            <div className="text-[14px] text-[#7C93AA]">
+              {category === "All" ? "Nothing here yet." : `No ${category} entries yet.`}
             </div>
-          </div>
-        ))}
-        {filtered.length === 0 && (
-          <div className="text-[14px] text-text-muted">
-            {category === "All" ? "Nothing here yet." : `No ${category} entries yet.`}
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

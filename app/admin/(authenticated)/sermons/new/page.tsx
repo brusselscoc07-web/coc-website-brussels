@@ -1,13 +1,19 @@
 import SermonForm from "@/components/admin/SermonForm";
+import Topbar from "@/components/admin/Topbar";
 
 export default function NewSermonPage() {
   return (
-    <div className="mx-auto max-w-3xl px-8 py-14">
-      <div className="mb-1 font-serif text-[32px] font-bold text-green-dark">New Resource</div>
-      <p className="mb-8 text-[13px] text-text-muted">
-        Use the Category field below to post this as a Sermon, a Thought for the Week, or a Bible Teachings study.
-      </p>
-      <SermonForm />
+    <div>
+      <Topbar title="New Resource" />
+      <div className="mx-auto max-w-3xl px-8 py-8">
+        <div className="rounded-[14px] border border-[#DCE7F0] bg-white p-6">
+          <p className="mb-6 text-[13px] text-[#7C93AA]">
+            Use the Category field below to post this as a Sermon, a Thought for the Week, or a Bible Teachings
+            study.
+          </p>
+          <SermonForm />
+        </div>
+      </div>
     </div>
   );
 }

@@ -17,7 +17,7 @@ export default function ConfirmSubmitButton({
       onClick={(e) => {
         if (!confirm(confirmText)) e.preventDefault();
       }}
-      className={className ?? "cursor-pointer text-[13px] font-semibold text-live"}
+      className={className ?? "cursor-pointer text-[13px] font-semibold text-[#C13B3B]"}
     >
       {children}
     </button>

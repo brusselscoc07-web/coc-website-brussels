@@ -5,15 +5,28 @@
 
 export const BRUSSELS_TZ = "Europe/Brussels";
 
-// Europe/Brussels shifts between CET (UTC+1) and CEST (UTC+2) on DST boundaries,
-// so a fixed offset would be wrong roughly half the year. This asks the JS
-// timezone database (via Intl) what Brussels' wall-clock time is at a given UTC
+// A short, curated list — not every IANA zone, just the ones a Brussels
+// congregation with a diaspora following would plausibly pick. Falls back to
+// BRUSSELS_TZ anywhere a stored value doesn't match one of these (e.g. old data).
+export const CHURCH_TIMEZONES = [
+  { value: "Europe/Brussels", label: "Brussels (CET/CEST)" },
+  { value: "Europe/London", label: "London (GMT/BST)" },
+  { value: "Europe/Paris", label: "Paris (CET/CEST)" },
+  { value: "Africa/Accra", label: "Accra (GMT)" },
+  { value: "Africa/Lagos", label: "Lagos (WAT)" },
+  { value: "America/New_York", label: "New York (ET)" },
+  { value: "UTC", label: "UTC" },
+] as const;
+
+// Any timezone shifts between standard and daylight time on DST boundaries, so
+// a fixed offset would be wrong part of the year. This asks the JS timezone
+// database (via Intl) what that zone's wall-clock time is at a given UTC
 // instant, and reads off the actual offset in effect at that instant — no
 // external timezone library needed.
-function brusselsOffsetMinutesAt(utcGuess: Date): number {
+function offsetMinutesAt(timeZone: string, utcGuess: Date): number {
   const parts = Object.fromEntries(
     new Intl.DateTimeFormat("en-US", {
-      timeZone: BRUSSELS_TZ,
+      timeZone,
       hour12: false,
       year: "numeric",
       month: "2-digit",
@@ -36,13 +49,28 @@ function brusselsOffsetMinutesAt(utcGuess: Date): number {
   return Math.round((asIfUTC - utcGuess.getTime()) / 60000);
 }
 
-// Converts a Brussels-local wall-clock date+time into the exact UTC instant it
-// represents, correctly accounting for whichever of CET/CEST is in effect on
-// that specific date.
-export function brusselsLocalToUTC(year: number, month0: number, day: number, hour: number, minute: number): Date {
+// Converts a local wall-clock date+time in the given IANA timezone into the
+// exact UTC instant it represents, correctly accounting for whichever
+// standard/daylight offset is in effect on that specific date. Defaults to
+// Brussels for the many call sites that only ever dealt with one timezone.
+export function localToUTC(
+  year: number,
+  month0: number,
+  day: number,
+  hour: number,
+  minute: number,
+  timeZone: string = BRUSSELS_TZ,
+): Date {
   const guess = new Date(Date.UTC(year, month0, day, hour, minute));
-  const offsetMinutes = brusselsOffsetMinutesAt(guess);
+  const offsetMinutes = offsetMinutesAt(timeZone, guess);
   return new Date(guess.getTime() - offsetMinutes * 60000);
+}
+
+// Kept as a thin, Brussels-specific alias — most existing call sites (events)
+// are intentionally always Brussels time, only the church-wide service-time
+// clock is timezone-selectable (see Site Settings).
+export function brusselsLocalToUTC(year: number, month0: number, day: number, hour: number, minute: number): Date {
+  return localToUTC(year, month0, day, hour, minute, BRUSSELS_TZ);
 }
 
 // Combines an ISO date ("YYYY-MM-DD", e.g. from an <input type="date">) with a
@@ -75,29 +103,37 @@ export function parseClockTime(text: string): ParsedTime | null {
 
 const WEEKDAYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 
-// The next UTC instant at which Brussels local time reaches the given weekday/hour/minute.
-export function nextWeeklyOccurrenceUTC(dayName: string, hour: number, minute: number, fromUTC: Date): Date {
+// The next UTC instant at which the given timezone's local time reaches the
+// given weekday/hour/minute. Defaults to Brussels for existing call sites.
+export function nextWeeklyOccurrenceUTC(
+  dayName: string,
+  hour: number,
+  minute: number,
+  fromUTC: Date,
+  timeZone: string = BRUSSELS_TZ,
+): Date {
   const targetDow = WEEKDAYS.indexOf(dayName.toLowerCase());
   if (targetDow === -1) throw new Error(`Unrecognized weekday: "${dayName}"`);
 
   for (let daysAhead = 0; daysAhead < 8; daysAhead++) {
     const candidateLocalDate = new Date(fromUTC.getTime() + daysAhead * 86400000);
-    const brusselsParts = new Intl.DateTimeFormat("en-US", {
-      timeZone: BRUSSELS_TZ,
+    const zoneParts = new Intl.DateTimeFormat("en-US", {
+      timeZone,
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
       weekday: "long",
     }).formatToParts(candidateLocalDate);
-    const partsByType = Object.fromEntries(brusselsParts.map((p) => [p.type, p.value]));
+    const partsByType = Object.fromEntries(zoneParts.map((p) => [p.type, p.value]));
     if (partsByType.weekday!.toLowerCase() !== WEEKDAYS[targetDow]) continue;
 
-    const candidateUTC = brusselsLocalToUTC(
+    const candidateUTC = localToUTC(
       Number(partsByType.year),
       Number(partsByType.month) - 1,
       Number(partsByType.day),
       hour,
       minute,
+      timeZone,
     );
     if (candidateUTC.getTime() > fromUTC.getTime()) return candidateUTC;
   }

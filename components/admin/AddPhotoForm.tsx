@@ -5,7 +5,7 @@ import { addPhoto, type AlbumFormState } from "@/app/admin/(authenticated)/album
 
 const initialState: AlbumFormState = {};
 
-const inputClass = "w-full rounded-[10px] border border-border px-4 py-3.5 font-sans text-[14px]";
+const inputClass = "w-full rounded-[8px] border border-[#CBD9E5] px-3.5 py-3 font-sans text-[14px]";
 
 export default function AddPhotoForm({ albumId }: { albumId: string }) {
   const [state, formAction, isPending] = useActionState(addPhoto.bind(null, albumId), initialState);
@@ -21,11 +21,11 @@ export default function AddPhotoForm({ albumId }: { albumId: string }) {
       <button
         type="submit"
         disabled={isPending}
-        className="cursor-pointer rounded-full bg-green px-6 py-3 text-[14px] font-semibold text-bg disabled:cursor-not-allowed disabled:opacity-60"
+        className="cursor-pointer rounded-[10px] bg-[#2E90D9] px-6 py-3 text-[13.5px] font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isPending ? "Uploading…" : "Add Photo"}
       </button>
-      {state.error && <p className="w-full text-[13px] text-live">{state.error}</p>}
+      {state.error && <p className="w-full text-[13px] text-[#C13B3B]">{state.error}</p>}
     </form>
   );
 }

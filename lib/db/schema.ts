@@ -139,3 +139,17 @@ export const rateLimitHits = pgTable(
   },
   (t) => [index("rate_limit_bucket_idx").on(t.bucketKey, t.createdAt)],
 );
+
+// One row per public-page view, recorded client-side (see
+// components/PageViewTracker.tsx + app/api/track-view/route.ts) so the admin
+// dashboard can show real visit counts. Intentionally minimal — no visitor
+// identity is stored, only path + timestamp.
+export const pageViews = pgTable(
+  "page_views",
+  {
+    id: serial("id").primaryKey(),
+    path: text("path").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("page_views_created_at_idx").on(t.createdAt)],
+);

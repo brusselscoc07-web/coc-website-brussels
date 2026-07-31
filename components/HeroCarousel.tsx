@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { heroSlides } from "@/lib/data";
+import { gradients } from "@/lib/data";
+import type { HeroSlide } from "@/lib/settings";
 
 type Countdown = { days: number; hours: number; minutes: number; seconds: number; label: string };
 
@@ -27,18 +28,19 @@ function computeCountdown(): Countdown {
   return { days, hours, minutes, seconds, label };
 }
 
-export default function HeroCarousel() {
+export default function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
   const [index, setIndex] = useState(0);
   const [countdown, setCountdown] = useState<Countdown | null>(null);
+  const count = slides.length || 1;
 
   useEffect(() => {
-    const heroTimer = setInterval(() => setIndex((i) => (i + 1) % 3), 5000);
+    const heroTimer = setInterval(() => setIndex((i) => (i + 1) % count), 5000);
     const countdownTimer = setInterval(() => setCountdown(computeCountdown()), 1000);
     return () => {
       clearInterval(heroTimer);
       clearInterval(countdownTimer);
     };
-  }, []);
+  }, [count]);
 
   const units = countdown
     ? [
@@ -54,15 +56,28 @@ export default function HeroCarousel() {
         { label: "Seconds", value: "00" },
       ];
 
+  if (slides.length === 0) return null;
+
   return (
     <div className="relative h-[min(88vh,760px)] min-h-[480px] overflow-hidden text-center text-bg">
       <div
-        className="flex h-full w-[300%] transition-transform duration-700 ease-[cubic-bezier(0.65,0,0.35,1)]"
-        style={{ transform: `translateX(-${index * (100 / 3)}%)` }}
+        className="flex h-full transition-transform duration-700 ease-[cubic-bezier(0.65,0,0.35,1)]"
+        style={{ width: `${count * 100}%`, transform: `translateX(-${index * (100 / count)}%)` }}
       >
-        {heroSlides.map((slide) => (
-          <div key={slide.headline} className="relative flex h-full w-1/3 shrink-0 items-center justify-center">
-            <div className="absolute inset-0" style={{ background: slide.gradient }} />
+        {slides.map((slide, i) => (
+          <div
+            key={slide.id}
+            className="relative flex h-full shrink-0 items-center justify-center"
+            style={{ width: `${100 / count}%` }}
+          >
+            <div
+              className="absolute inset-0"
+              style={
+                slide.imageUrl
+                  ? { backgroundImage: `url(${slide.imageUrl})`, backgroundSize: "cover", backgroundPosition: "center" }
+                  : { background: gradients[i % gradients.length] }
+              }
+            />
             <div
               className="absolute inset-0"
               style={{ background: "linear-gradient(180deg, rgba(27,46,37,0.15), rgba(27,46,37,0.55))" }}
@@ -92,20 +107,24 @@ export default function HeroCarousel() {
         ))}
       </div>
 
-      <button
-        aria-label="Previous slide"
-        onClick={() => setIndex((i) => (i + 2) % 3)}
-        className="absolute left-5 top-1/2 z-[3] -translate-y-1/2 cursor-pointer text-[30px] text-bg-alt"
-      >
-        ‹
-      </button>
-      <button
-        aria-label="Next slide"
-        onClick={() => setIndex((i) => (i + 1) % 3)}
-        className="absolute right-5 top-1/2 z-[3] -translate-y-1/2 cursor-pointer text-[30px] text-bg-alt"
-      >
-        ›
-      </button>
+      {count > 1 && (
+        <>
+          <button
+            aria-label="Previous slide"
+            onClick={() => setIndex((i) => (i + count - 1) % count)}
+            className="absolute left-5 top-1/2 z-[3] -translate-y-1/2 cursor-pointer text-[30px] text-bg-alt"
+          >
+            ‹
+          </button>
+          <button
+            aria-label="Next slide"
+            onClick={() => setIndex((i) => (i + 1) % count)}
+            className="absolute right-5 top-1/2 z-[3] -translate-y-1/2 cursor-pointer text-[30px] text-bg-alt"
+          >
+            ›
+          </button>
+        </>
+      )}
 
       <div className="absolute bottom-16 left-0 right-0 z-[3] flex justify-center px-5">
         <div className="flex w-[min(560px,92%)] flex-wrap items-center justify-center gap-[26px] rounded-2xl bg-[rgba(20,22,18,0.55)] px-[30px] py-3.5 backdrop-blur-sm">
@@ -128,17 +147,19 @@ export default function HeroCarousel() {
         </div>
       </div>
 
-      <div className="absolute bottom-5 left-0 right-0 z-[3] flex justify-center gap-2.5">
-        {heroSlides.map((slide, i) => (
-          <button
-            key={slide.headline}
-            aria-label={`Go to slide ${i + 1}`}
-            onClick={() => setIndex(i)}
-            className="inline-block h-2 cursor-pointer rounded-full transition-all duration-300"
-            style={{ width: i === index ? "24px" : "8px", background: i === index ? "#C79A46" : "rgba(241,233,216,0.4)" }}
-          />
-        ))}
-      </div>
+      {count > 1 && (
+        <div className="absolute bottom-5 left-0 right-0 z-[3] flex justify-center gap-2.5">
+          {slides.map((slide, i) => (
+            <button
+              key={slide.id}
+              aria-label={`Go to slide ${i + 1}`}
+              onClick={() => setIndex(i)}
+              className="inline-block h-2 cursor-pointer rounded-full transition-all duration-300"
+              style={{ width: i === index ? "24px" : "8px", background: i === index ? "#C79A46" : "rgba(241,233,216,0.4)" }}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -20,8 +20,8 @@ type SermonRow = {
 
 const initialState: SermonFormState = {};
 
-const inputClass = "w-full rounded-[10px] border border-border px-4 py-3.5 font-sans text-[14px]";
-const labelClass = "mb-1.5 block text-[12px] tracking-[1px] text-gold uppercase";
+const inputClass = "w-full rounded-[8px] border border-[#CBD9E5] px-3.5 py-3 font-sans text-[14px]";
+const labelClass = "mb-1.5 block text-[12.5px] text-[#7C93AA]";
 
 export default function SermonForm({ sermon }: { sermon?: SermonRow }) {
   const action = sermon ? updateSermon.bind(null, sermon.id) : createSermon;
@@ -32,7 +32,7 @@ export default function SermonForm({ sermon }: { sermon?: SermonRow }) {
       {sermon ? (
         <div>
           <div className={labelClass}>Slug</div>
-          <div className="text-[15px] text-text-muted">{sermon.id} (can&apos;t be changed)</div>
+          <div className="text-[15px] text-[#7C93AA]">{sermon.id} (can&apos;t be changed)</div>
         </div>
       ) : (
         <div>
@@ -40,7 +40,7 @@ export default function SermonForm({ sermon }: { sermon?: SermonRow }) {
             Slug (used in the URL, e.g. walking-by-faith)
           </label>
           <input id="id" name="id" className={inputClass} placeholder="walking-by-faith" />
-          {state.fieldErrors?.id && <p className="mt-1.5 text-[13px] text-live">{state.fieldErrors.id}</p>}
+          {state.fieldErrors?.id && <p className="mt-1.5 text-[13px] text-[#C13B3B]">{state.fieldErrors.id}</p>}
         </div>
       )}
 
@@ -49,7 +49,7 @@ export default function SermonForm({ sermon }: { sermon?: SermonRow }) {
           Title
         </label>
         <input id="title" name="title" defaultValue={sermon?.title} className={inputClass} />
-        {state.fieldErrors?.title && <p className="mt-1.5 text-[13px] text-live">{state.fieldErrors.title}</p>}
+        {state.fieldErrors?.title && <p className="mt-1.5 text-[13px] text-[#C13B3B]">{state.fieldErrors.title}</p>}
       </div>
 
       <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-5">
@@ -58,14 +58,14 @@ export default function SermonForm({ sermon }: { sermon?: SermonRow }) {
             Date
           </label>
           <input id="date" name="date" type="date" defaultValue={sermon?.date} className={inputClass} />
-          {state.fieldErrors?.date && <p className="mt-1.5 text-[13px] text-live">{state.fieldErrors.date}</p>}
+          {state.fieldErrors?.date && <p className="mt-1.5 text-[13px] text-[#C13B3B]">{state.fieldErrors.date}</p>}
         </div>
         <div>
           <label className={labelClass} htmlFor="preacher">
             Preacher
           </label>
           <input id="preacher" name="preacher" defaultValue={sermon?.preacher} className={inputClass} />
-          {state.fieldErrors?.preacher && <p className="mt-1.5 text-[13px] text-live">{state.fieldErrors.preacher}</p>}
+          {state.fieldErrors?.preacher && <p className="mt-1.5 text-[13px] text-[#C13B3B]">{state.fieldErrors.preacher}</p>}
         </div>
         <div>
           <label className={labelClass} htmlFor="scripture">
@@ -111,7 +111,7 @@ export default function SermonForm({ sermon }: { sermon?: SermonRow }) {
           rows={10}
           className={`${inputClass} resize-y`}
         />
-        {state.fieldErrors?.body && <p className="mt-1.5 text-[13px] text-live">{state.fieldErrors.body}</p>}
+        {state.fieldErrors?.body && <p className="mt-1.5 text-[13px] text-[#C13B3B]">{state.fieldErrors.body}</p>}
       </div>
 
       <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-5">
@@ -121,7 +121,7 @@ export default function SermonForm({ sermon }: { sermon?: SermonRow }) {
           </label>
           <input id="videoUrl" name="videoUrl" defaultValue={sermon?.videoUrl ?? ""} className={inputClass} />
         </div>
-        <label className="mt-6 flex items-center gap-2.5 text-[14px] text-text">
+        <label className="mt-6 flex items-center gap-2.5 text-[14px] text-[#1B1E2B]">
           <input type="checkbox" name="hasVideo" defaultChecked={sermon?.hasVideo} className="h-4 w-4" />
           Has a video recording
         </label>
@@ -137,12 +137,12 @@ export default function SermonForm({ sermon }: { sermon?: SermonRow }) {
         <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp" className={inputClass} />
       </div>
 
-      {state.error && <p className="text-[14px] text-live">{state.error}</p>}
+      {state.error && <p className="text-[14px] text-[#C13B3B]">{state.error}</p>}
 
       <button
         type="submit"
         disabled={isPending}
-        className="cursor-pointer self-start rounded-full bg-green px-7 py-3 text-[14px] font-semibold text-bg disabled:cursor-not-allowed disabled:opacity-60"
+        className="cursor-pointer self-start rounded-[10px] bg-[#2E90D9] px-6 py-3 text-[13.5px] font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isPending ? "Saving…" : sermon ? "Save Changes" : "Create Resource"}
       </button>

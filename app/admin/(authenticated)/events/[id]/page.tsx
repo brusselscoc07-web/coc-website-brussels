@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import EventForm from "@/components/admin/EventForm";
+import Topbar from "@/components/admin/Topbar";
 import { getDb } from "@/lib/db";
 import { events as eventsTable } from "@/lib/db/schema";
 
@@ -13,9 +14,13 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
   if (!event) notFound();
 
   return (
-    <div className="mx-auto max-w-3xl px-8 py-14">
-      <div className="mb-8 font-serif text-[32px] font-bold text-green-dark">Edit Event</div>
-      <EventForm event={event} />
+    <div>
+      <Topbar title="Edit Event" />
+      <div className="mx-auto max-w-3xl px-8 py-8">
+        <div className="rounded-[14px] border border-[#DCE7F0] bg-white p-6">
+          <EventForm event={event} />
+        </div>
+      </div>
     </div>
   );
 }

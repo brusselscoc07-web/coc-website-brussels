@@ -1,26 +1,35 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import DualTimezoneTime from "@/components/DualTimezoneTime";
-import { location, worshipItems } from "@/lib/data";
-import { nextWeeklyOccurrenceUTC, parseClockTime } from "@/lib/timezone";
+import { getAboutContent, getSiteSettings } from "@/lib/settings";
+import { formatTime12h, to24Hour } from "@/lib/time";
+import { CHURCH_TIMEZONES, nextWeeklyOccurrenceUTC } from "@/lib/timezone";
 
 export const metadata: Metadata = {
   title: "About Us — Church of Christ Brussels",
 };
 
-// "Next occurrence" is computed from the current time — without this, a
-// statically-built page would freeze it at build time and it'd silently go
-// stale (still showing a "next Friday" that already passed).
-export const revalidate = 3600;
+// Now reads from the database (About + Site settings, edited at /admin/about
+// and /admin/settings), so it must render fresh per request rather than as a
+// static/ISR page — see the note on app/page.tsx's `dynamic` export for the
+// PGlite reasoning.
+export const dynamic = "force-dynamic";
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const [about, site] = await Promise.all([getAboutContent(), getSiteSettings()]);
   const now = new Date();
-  const worshipTimes = location.times.map((t) => {
-    const start = parseClockTime(t.time);
-    const nextOccurrenceIso = start
-      ? nextWeeklyOccurrenceUTC(t.day, start.hour, start.minute, now).toISOString()
-      : null;
-    return { ...t, nextOccurrenceIso };
+  const tzLabel = CHURCH_TIMEZONES.find((tz) => tz.value === site.timezone)?.label ?? site.timezone;
+  const worshipTimes = site.serviceTimes.map((t) => {
+    const start24 = to24Hour(t.start);
+    const nextOccurrenceIso = nextWeeklyOccurrenceUTC(
+      t.day,
+      start24.hour,
+      start24.minute,
+      now,
+      site.timezone,
+    ).toISOString();
+    const display = t.end ? `${formatTime12h(t.start)} – ${formatTime12h(t.end)}` : formatTime12h(t.start);
+    return { ...t, display, nextOccurrenceIso };
   });
 
   return (
@@ -33,11 +42,7 @@ export default function AboutPage() {
       <div className="mb-16 grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-10">
         <div>
           <div className="mb-3 font-serif text-[22px] font-bold text-green">What We Believe</div>
-          <div className="text-[15px] leading-[1.8] text-text">
-            We have no creed but Christ, no book but the Bible. We seek to be simply Christians, wearing no
-            denominational name and holding only to the teaching of the New Testament as our guide for faith and
-            practice.
-          </div>
+          <div className="text-[15px] leading-[1.8] text-text">{about.statement}</div>
         </div>
         <div>
           <div className="mb-3 font-serif text-[22px] font-bold text-green">The Plan of Salvation</div>
@@ -54,7 +59,7 @@ export default function AboutPage() {
           style={{ background: "linear-gradient(135deg,#2C4A3D,#C79A46)" }}
         />
         <div>
-          <div className="font-serif text-[24px] font-bold text-green-dark">{location.preacher}</div>
+          <div className="font-serif text-[24px] font-bold text-green-dark">{about.preacher}</div>
           <div className="my-1.5 text-[13px] tracking-[2px] text-gold uppercase">Preaching Minister</div>
           <div className="text-[14px] leading-[1.7] text-text">
             Joseph has served the congregation for over a decade, shepherding the church through teaching, counsel,
@@ -72,9 +77,9 @@ export default function AboutPage() {
           <div className="flex h-full flex-col">
             <div className="mb-5 font-serif text-[26px] font-bold text-green">Our worship consists of</div>
             <div className="flex flex-1 flex-col justify-start gap-[22px]">
-              {worshipItems.map((wi) => (
-                <div key={wi.label} className="flex items-baseline gap-4">
-                  <span className="font-serif text-[22px] font-bold text-gold">{wi.num}</span>
+              {about.worshipItems.map((wi, i) => (
+                <div key={wi.id} className="flex items-baseline gap-4">
+                  <span className="font-serif text-[22px] font-bold text-gold">{String(i + 1).padStart(2, "0")}</span>
                   <span className="text-[18px] text-ink-soft">{wi.label}</span>
                 </div>
               ))}
@@ -83,37 +88,35 @@ export default function AboutPage() {
           <div className="flex flex-col gap-4 rounded-[20px] border border-border bg-white p-7">
             <div>
               <div className="mb-1 text-[11px] tracking-[1.5px] text-gold uppercase">Worship Place</div>
-              <div className="text-[15px] text-green-dark">{location.place}</div>
+              <div className="text-[15px] text-green-dark">{about.worshipPlace}</div>
             </div>
             <div>
               <div className="mb-1 text-[11px] tracking-[1.5px] text-gold uppercase">Preacher</div>
-              <div className="text-[15px] text-green-dark">{location.preacher}</div>
+              <div className="text-[15px] text-green-dark">{about.preacher}</div>
             </div>
             <div>
               <div className="mb-1 text-[11px] tracking-[1.5px] text-gold uppercase">Address</div>
-              <div className="text-[15px] text-green-dark">{location.address}</div>
+              <div className="text-[15px] text-green-dark">{site.address}</div>
             </div>
             <div>
               <div className="mb-1 text-[11px] tracking-[1.5px] text-gold uppercase">Times</div>
               {worshipTimes.map((t) => (
-                <div key={t.day} className="mb-1.5 last:mb-0">
+                <div key={t.id} className="mb-1.5 last:mb-0">
                   <div className="text-[15px] text-green-dark">
-                    {t.day}: {t.time} <span className="text-text-muted">Brussels time</span>
+                    {t.day}: {t.display} <span className="text-text-muted">{tzLabel}</span>
                   </div>
-                  {t.nextOccurrenceIso && (
-                    <div className="text-[12.5px] text-text-muted">
-                      Starts <DualTimezoneTime iso={t.nextOccurrenceIso} />
-                    </div>
-                  )}
+                  <div className="text-[12.5px] text-text-muted">
+                    Starts <DualTimezoneTime iso={t.nextOccurrenceIso} />
+                  </div>
                 </div>
               ))}
             </div>
             <div>
               <div className="mb-1 text-[11px] tracking-[1.5px] text-gold uppercase">Zoom</div>
-              <a href={location.zoomLink} target="_blank" rel="noreferrer" className="text-[15px] font-semibold text-green no-underline">
+              <a href={about.zoomLink || "#"} target="_blank" rel="noreferrer" className="text-[15px] font-semibold text-green no-underline">
                 Join on Zoom →
               </a>
-              <div className="mt-0.5 text-[12px] text-text-muted">{location.zoomNote}</div>
+              <div className="mt-0.5 text-[12px] text-text-muted">{about.zoomNote}</div>
             </div>
           </div>
         </div>

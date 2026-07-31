@@ -3,10 +3,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import DualTimezoneTime from "@/components/DualTimezoneTime";
-import { buildIcs, location } from "@/lib/data";
+import { buildIcs } from "@/lib/data";
 import { getDb } from "@/lib/db";
 import { events as eventsTable } from "@/lib/db/schema";
 import { formatDate } from "@/lib/format";
+import { getSiteSettings } from "@/lib/settings";
 
 export async function generateMetadata({ params }: { params: Promise<{ eventId: string }> }): Promise<Metadata> {
   const { eventId } = await params;
@@ -20,6 +21,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ ev
   const db = await getDb();
   const [event] = await db.select().from(eventsTable).where(eq(eventsTable.id, eventId));
   if (!event) notFound();
+  const site = await getSiteSettings();
 
   return (
     <div>
@@ -62,7 +64,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ ev
           </div>
           <div className="rounded-2xl border border-border bg-white p-[22px]">
             <div className="mb-2 text-[11px] tracking-[1.5px] text-gold uppercase">Location</div>
-            <div className="text-[17px] font-semibold text-green-dark">{event.location || location.address}</div>
+            <div className="text-[17px] font-semibold text-green-dark">{event.location || site.address}</div>
           </div>
         </div>
         <div className="mb-4 font-serif text-[24px] font-bold text-green-dark">About This Event</div>
@@ -73,12 +75,15 @@ export default async function EventDetailPage({ params }: { params: Promise<{ ev
             <div className="text-[14px] text-text-muted">Add this event to your calendar so you don&apos;t forget.</div>
           </div>
           <a
-            href={buildIcs({
-              id: event.id,
-              title: event.title,
-              description: event.description || "",
-              location: event.location || "",
-            })}
+            href={buildIcs(
+              {
+                id: event.id,
+                title: event.title,
+                description: event.description || "",
+                location: event.location || "",
+              },
+              site.address,
+            )}
             download={`${event.id}.ics`}
             className="inline-block cursor-pointer whitespace-nowrap rounded-full bg-green px-[30px] py-3.5 text-[14px] font-semibold text-bg no-underline"
           >

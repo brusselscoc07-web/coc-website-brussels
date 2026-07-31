@@ -1,10 +1,12 @@
-import { socialLinks } from "@/lib/data";
+import { getSiteSettings } from "@/lib/settings";
 import SocialIcon from "./SocialIcon";
 
-export default function SocialLinksGrid() {
+export default async function SocialLinksGrid() {
+  const site = await getSiteSettings();
+
   return (
     <div className="grid grid-cols-[repeat(auto-fit,minmax(230px,1fr))] gap-5">
-      {socialLinks.map((soc) => (
+      {site.socialLinks.map((soc) => (
         <a
           key={soc.key}
           href={soc.url}

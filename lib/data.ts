@@ -49,20 +49,6 @@ export type SocialLink = {
   url: string;
 };
 
-export const location = {
-  place: "Shalom Center",
-  preacher: "Bro. Joseph Acheampong",
-  address: "Rue Madyol 5, 1200 Brussels, Belgium",
-  phone: "+32 2 123 45 67",
-  hours: "Monday – Friday, 9:00am – 5:00pm (GMT+1)",
-  times: [
-    { day: "Friday", time: "20:00 – 21:30" },
-    { day: "Sunday", time: "12:30 – 15:00" },
-  ],
-  zoomLink: "https://zoom.us/j/1234567890",
-  zoomNote: "Same as worship time",
-};
-
 export const navLinks = [
   { key: "home", label: "Home", href: "/" },
   { key: "about", label: "About Us", href: "/about" },
@@ -332,25 +318,6 @@ export const albums: Album[] = [
   },
 ];
 
-export const socialLinks: SocialLink[] = [
-  { key: "youtube", label: "YouTube", handle: "@cocbrussels", note: "Watch our sermons", url: "https://youtube.com" },
-  {
-    key: "facebook",
-    label: "Facebook",
-    handle: "Church of Christ Brussels",
-    note: "Follow our page",
-    url: "https://facebook.com",
-  },
-  {
-    key: "instagram",
-    label: "Instagram",
-    handle: "@cocbrussels",
-    note: "See our latest moments",
-    url: "https://instagram.com",
-  },
-  { key: "whatsapp", label: "WhatsApp", handle: "+32 2 123 45 67", note: "Chat with us", url: "https://wa.me/3221234567" },
-];
-
 export const heroSlides = [
   {
     headline: "You Are Welcome Here",
@@ -397,13 +364,16 @@ export function eventImage(id: string, size = "1200/700") {
   return `https://picsum.photos/seed/event-${id}/${size}`;
 }
 
-export function mapHref() {
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location.address)}`;
+export function mapHref(address: string) {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
 }
 
-export function buildIcs(event: { id: string; title: string; description: string; location: string }) {
+export function buildIcs(
+  event: { id: string; title: string; description: string; location: string },
+  fallbackLocation: string,
+) {
   const uid = `${event.id}@cocbrussels`;
-  const loc = event.location || location.address;
+  const loc = event.location || fallbackLocation;
   const text = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",

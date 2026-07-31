@@ -1,31 +1,36 @@
-import { location } from "@/lib/data";
+import { getSiteSettings } from "@/lib/settings";
+import { formatTime12h } from "@/lib/time";
 import SocialIconRow from "./SocialIconRow";
 
-export default function SiteFooter() {
+export default async function SiteFooter() {
+  const site = await getSiteSettings();
+
   return (
     <div className="shrink-0 bg-green-dark px-8 pb-7 pt-14 text-cream">
       <div className="mx-auto mb-8 grid max-w-6xl grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-8">
         <div>
           <div className="mb-1.5 font-serif text-[22px] font-bold">Church of Christ</div>
           <div className="mb-3.5 text-[12px] tracking-[2px] text-gold uppercase">Brussels</div>
-          <div className="text-[13px] leading-[1.7] text-footer-muted">
-            A family of faith devoted to Scripture, worship, and one another.
-          </div>
+          <div className="text-[13px] leading-[1.7] text-footer-muted">{site.tagline}</div>
         </div>
         <div>
           <div className="mb-3 text-[13px] font-semibold text-cream">Service Times</div>
           <div className="text-[13px] leading-[1.8] text-footer-muted">
-            Friday: 20:00 – 21:30
-            <br />
-            Sunday: 12:30 – 15:00
+            {site.serviceTimes.map((t, i) => (
+              <span key={t.id}>
+                {i > 0 && <br />}
+                {t.day}: {formatTime12h(t.start)}
+                {t.end ? ` – ${formatTime12h(t.end)}` : ""}
+              </span>
+            ))}
           </div>
         </div>
         <div>
           <div className="mb-3 text-[13px] font-semibold text-cream">Visit</div>
           <div className="text-[13px] leading-[1.8] text-footer-muted">
-            {location.address}
+            {site.address}
             <br />
-            {location.phone}
+            {site.phone}
           </div>
         </div>
         <div>

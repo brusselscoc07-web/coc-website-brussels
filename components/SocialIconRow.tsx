@@ -1,10 +1,12 @@
-import { socialLinks } from "@/lib/data";
+import { getSiteSettings } from "@/lib/settings";
 import SocialIcon from "./SocialIcon";
 
-export default function SocialIconRow({ size = 38 }: { size?: number }) {
+export default async function SocialIconRow({ size = 38 }: { size?: number }) {
+  const site = await getSiteSettings();
+
   return (
     <div className="flex flex-nowrap gap-3">
-      {socialLinks.map((soc) => (
+      {site.socialLinks.map((soc) => (
         <a
           key={soc.key}
           href={soc.url}
