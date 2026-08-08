@@ -11,7 +11,7 @@ import { useToast } from "./ToastProvider";
 
 const inputClass = "w-full rounded-[8px] border border-[#CBDBE8] px-3.5 py-3 font-sans text-[14px]";
 const selectClass = "w-full rounded-[8px] border border-[#CBDBE8] bg-white px-3.5 py-3 font-sans text-[14px]";
-const smallInputClass = "w-full rounded-[8px] border border-[#CBDBE8] px-3 py-2.5 font-sans text-[13.5px]";
+const smallInputClass = "w-full rounded-[8px] border border-[#CBDBE8] px-3 py-2.5 font-sans text-[13.5px] text-[#16233A]";
 const labelClass = "mb-1.5 block text-[12.5px] text-[#7C93AA]";
 const cardClass = "rounded-[14px] border border-[#DCE7F0] bg-white p-6";
 

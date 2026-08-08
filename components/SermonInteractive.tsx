@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useRef, useState } from "react";
 import type { Comment } from "@/lib/data";
 import { submitComment, type CommentFormState } from "@/app/sermons/[slug]/actions";
@@ -25,14 +26,26 @@ export default function SermonInteractive({
   initialReactions: ReactionCounts;
   initialMyReaction: ReactionKind | null;
 }) {
+  const router = useRouter();
   const [copyModalOpen, setCopyModalOpen] = useState(false);
   const [copyButtonState, setCopyButtonState] = useState<"idle" | "copied">("idle");
   const [reactions, setReactions] = useState(initialReactions);
   const [myReaction, setMyReaction] = useState<ReactionKind | null>(initialMyReaction);
   const [reactionPending, setReactionPending] = useState(false);
   const [origin, setOrigin] = useState("");
+  const [showCommented, setShowCommented] = useState(justCommented);
   const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const linkInputRef = useRef<HTMLInputElement>(null);
+
+  // Auto-hide after 5s so the confirmation doesn't linger for anyone else who
+  // opens this same URL later, and strip the query param immediately so a
+  // reload or a copy-pasted link doesn't re-trigger it at all.
+  useEffect(() => {
+    if (!justCommented) return;
+    router.replace(`/sermons/${sermonId}`, { scroll: false });
+    const timer = setTimeout(() => setShowCommented(false), 5000);
+    return () => clearTimeout(timer);
+  }, [justCommented, sermonId, router]);
 
   // Empty on the server and on first paint, filled in after mount — keeps
   // the initial client render matching the server render (no hydration
@@ -209,7 +222,7 @@ export default function SermonInteractive({
       </div>
 
       <div className="mb-5 font-serif text-[24px] font-bold text-green-dark">Comments/Questions</div>
-      {justCommented && (
+      {showCommented && (
         <div className="mb-5 rounded-xl bg-bg-alt px-5 py-4 text-[14px] text-text">
           Thanks — your comment/question has been submitted and is awaiting approval before it appears publicly.
         </div>

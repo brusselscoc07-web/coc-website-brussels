@@ -1,10 +1,13 @@
 import { desc, eq } from "drizzle-orm";
-import ConfirmSubmitButton from "@/components/admin/ConfirmSubmitButton";
+import CommentPreview from "@/components/admin/CommentPreview";
 import Topbar from "@/components/admin/Topbar";
 import { getDb } from "@/lib/db";
 import { comments, sermons } from "@/lib/db/schema";
 import { formatDate } from "@/lib/format";
-import { approveComment, rejectComment, revertToPending } from "./actions";
+import { markCommentAsRead, publishComment, revertToPending } from "./actions";
+
+const STATUS_LABEL: Record<string, string> = { approved: "Published", read: "Read" };
+const STATUS_COLOR: Record<string, string> = { approved: "#1F8A4C", read: "#7C93AA" };
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +19,7 @@ export default async function AdminCommentsPage() {
       sermonId: comments.sermonId,
       sermonTitle: sermons.title,
       name: comments.name,
+      email: comments.email,
       text: comments.text,
       status: comments.status,
       createdAt: comments.createdAt,
@@ -29,7 +33,7 @@ export default async function AdminCommentsPage() {
 
   return (
     <div>
-      <Topbar title="Comments" subtitle="Approve or reject visitor comments before they go live" />
+      <Topbar title="Comments" subtitle="Mark as read or publish visitor comments/questions" />
       <div className="mx-auto max-w-4xl px-8 py-8">
       <div className="mb-4 text-[15px] font-semibold text-[#16233A]">Pending ({pending.length})</div>
       <div className="mb-12 flex flex-col gap-3">
@@ -40,23 +44,29 @@ export default async function AdminCommentsPage() {
               <span className="text-[12px] text-[#7C93AA]">{formatDate(c.createdAt)}</span>
               <span className="text-[12px] text-[#7C93AA]">on &ldquo;{c.sermonTitle}&rdquo;</span>
             </div>
-            <div className="mb-3 text-[14px] leading-[1.6] text-[#1B1E2B]">{c.text}</div>
+            <CommentPreview
+              name={c.name}
+              email={c.email}
+              sermonTitle={c.sermonTitle}
+              text={c.text}
+              date={formatDate(c.createdAt)}
+            />
             <div className="flex gap-3">
-              <form action={approveComment.bind(null, c.id, c.sermonId)}>
+              <form action={publishComment.bind(null, c.id, c.sermonId)}>
                 <button
                   type="submit"
                   className="cursor-pointer rounded-full bg-[#2E90D9] px-5 py-2 text-[13px] font-semibold text-white"
                 >
-                  Approve
+                  Publish
                 </button>
               </form>
-              <form action={rejectComment.bind(null, c.id, c.sermonId)}>
-                <ConfirmSubmitButton
-                  confirmText="Reject this comment?"
-                  className="cursor-pointer rounded-full border border-[#DCE7F0] px-5 py-2 text-[13px] font-semibold text-[#C13B3B]"
+              <form action={markCommentAsRead.bind(null, c.id, c.sermonId)}>
+                <button
+                  type="submit"
+                  className="cursor-pointer rounded-full border border-[#DCE7F0] px-5 py-2 text-[13px] font-semibold text-[#7C93AA]"
                 >
-                  Reject
-                </ConfirmSubmitButton>
+                  Mark as read
+                </button>
               </form>
             </div>
           </div>
@@ -72,13 +82,19 @@ export default async function AdminCommentsPage() {
               <span className="text-[14px] font-semibold text-[#16233A]">{c.name}</span>
               <span
                 className="rounded-full px-2.5 py-0.5 text-[10.5px] font-semibold uppercase tracking-[1px]"
-                style={{ background: c.status === "approved" ? "#1F8A4C" : "#C13B3B", color: "#FFFFFF" }}
+                style={{ background: STATUS_COLOR[c.status] ?? "#7C93AA", color: "#FFFFFF" }}
               >
-                {c.status}
+                {STATUS_LABEL[c.status] ?? c.status}
               </span>
               <span className="text-[12px] text-[#7C93AA]">on &ldquo;{c.sermonTitle}&rdquo;</span>
             </div>
-            <div className="mb-3 text-[14px] leading-[1.6] text-[#1B1E2B]">{c.text}</div>
+            <CommentPreview
+              name={c.name}
+              email={c.email}
+              sermonTitle={c.sermonTitle}
+              text={c.text}
+              date={formatDate(c.createdAt)}
+            />
             <form action={revertToPending.bind(null, c.id, c.sermonId)}>
               <button type="submit" className="cursor-pointer text-[12px] font-semibold text-[#7C93AA]">
                 Move back to pending

@@ -12,17 +12,17 @@ export default function AddPhotoForm({ albumId }: { albumId: string }) {
   const [state, formAction, isPending] = useActionState(addPhoto.bind(null, albumId), initialState);
 
   return (
-    <form action={formAction} className="flex flex-wrap items-end gap-3">
-      <div className="min-w-[220px] flex-1">
+    <form action={formAction} className="flex flex-col gap-3 lg:flex-row lg:items-end">
+      <div className="min-w-0 flex-1">
         <ImageFileInput id="image" name="image" />
       </div>
-      <div className="min-w-[200px] flex-1">
+      <div className="w-full lg:w-56">
         <input id="caption" name="caption" placeholder="Caption (optional)" className={inputClass} />
       </div>
       <button
         type="submit"
         disabled={isPending}
-        className="cursor-pointer rounded-[10px] bg-[#2E90D9] px-6 py-3 text-[13.5px] font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+        className="shrink-0 cursor-pointer rounded-[10px] bg-[#2E90D9] px-6 py-3 text-[13.5px] font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isPending ? "Uploading…" : "Add Photo"}
       </button>

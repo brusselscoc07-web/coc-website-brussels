@@ -4,7 +4,7 @@ import Topbar from "@/components/admin/Topbar";
 export default function NewAlbumPage() {
   return (
     <div>
-      <Topbar title="New Album" />
+      <Topbar title="New Album" backHref="/admin/albums" />
       <div className="mx-auto max-w-3xl px-8 py-8">
         <div className="rounded-[14px] border border-[#DCE7F0] bg-white p-6">
           <AlbumForm />

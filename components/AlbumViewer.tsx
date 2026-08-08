@@ -26,7 +26,7 @@ export default function AlbumViewer({ photos }: { photos: Photo[] }) {
 
   return (
     <>
-      <div className="relative mx-auto mb-10 h-[360px] w-[min(460px,90vw)]">
+      <div className="relative mx-auto mb-10 h-[260px] w-[min(460px,78vw)] min-[880px]:h-[360px] min-[880px]:w-[min(460px,90vw)]">
         {stackPhotos.map(({ photo, index, k }) => (
           <div
             key={photo.id}

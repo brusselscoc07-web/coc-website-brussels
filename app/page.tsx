@@ -80,7 +80,7 @@ export default async function HomePage() {
               className="h-[180px]"
               style={{ backgroundImage: `url(${latestSermon.imageUrl})`, backgroundSize: "cover", backgroundPosition: "center" }}
             />
-            <div className="p-[26px]">
+            <div className="p-5 min-[880px]:p-[26px]">
               <div className="mb-2 text-[12px] tracking-[2px] text-gold uppercase">Latest Sermon</div>
               <div className="mb-2 font-serif text-[24px] font-bold text-green-dark">{latestSermon.title}</div>
               <div className="mb-3.5 text-[13px] text-text-muted">{formatDate(latestSermon.date)}</div>
@@ -98,7 +98,7 @@ export default async function HomePage() {
             className="overflow-hidden rounded-[20px] border border-border bg-white no-underline"
           >
             <div className="h-[180px]" style={{ background: "linear-gradient(135deg,#C79A46,#8f6f2c)" }} />
-            <div className="p-[26px]">
+            <div className="p-5 min-[880px]:p-[26px]">
               <div className="mb-2 text-[12px] tracking-[2px] text-green uppercase">Next Event</div>
               <div className="mb-2 font-serif text-[24px] font-bold text-green-dark">{nextEvent.title}</div>
               <div className="mb-3.5 text-[13px] text-text-muted">
@@ -115,7 +115,7 @@ export default async function HomePage() {
         {latestThought && (
           <Link
             href={`/sermons/${latestThought.id}`}
-            className="flex flex-col rounded-[20px] border border-border bg-white p-[26px] no-underline"
+            className="flex flex-col rounded-[20px] border border-border bg-white p-5 no-underline min-[880px]:p-[26px]"
           >
             <div className="mb-2 text-[12px] tracking-[2px] text-gold uppercase">Thought For The Week</div>
             <div className="mb-2 font-serif text-[20px] font-bold text-green-dark">{latestThought.title}</div>
@@ -134,7 +134,7 @@ export default async function HomePage() {
         <div className="mx-auto max-w-6xl">
           <div className="mb-9 text-center">
             <div className="mb-2 text-[13px] tracking-[3px] text-gold uppercase">Stay Connected</div>
-            <div className="font-serif text-[32px] font-bold text-green-dark">Follow Us Online</div>
+            <div className="font-serif text-[24px] font-bold text-green-dark min-[880px]:text-[32px]">Follow Us Online</div>
           </div>
           <SocialLinksGrid />
         </div>

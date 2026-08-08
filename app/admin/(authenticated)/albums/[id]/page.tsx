@@ -24,7 +24,7 @@ export default async function ManageAlbumPage({ params }: { params: Promise<{ id
 
   return (
     <div>
-      <Topbar title="Manage Album" />
+      <Topbar title="Manage Album" backHref="/admin/albums" />
       <div className="mx-auto flex max-w-3xl flex-col gap-[18px] px-8 py-8">
         <div className="rounded-[14px] border border-[#DCE7F0] bg-white p-6">
           <AlbumForm album={album} />

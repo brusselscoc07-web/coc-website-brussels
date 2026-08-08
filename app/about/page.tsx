@@ -36,7 +36,7 @@ export default async function AboutPage() {
     <div className="mx-auto max-w-[1000px] px-8 py-20">
       <div className="mb-14 text-center">
         <div className="mb-2.5 text-[13px] tracking-[3px] text-gold uppercase">Who We Are</div>
-        <div className="font-serif text-[42px] font-bold text-green-dark">About Us</div>
+        <div className="font-serif text-[28px] font-bold text-green-dark min-[880px]:text-[42px]">About Us</div>
       </div>
 
       <div className="mb-16 grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-10">
@@ -65,7 +65,7 @@ export default async function AboutPage() {
       <div className="mt-16 border-t border-border pt-14">
         <div className="mb-12 text-center">
           <div className="mb-2.5 text-[13px] tracking-[3px] text-gold uppercase">Come Worship</div>
-          <div className="font-serif text-[42px] font-bold text-green-dark">Join Us</div>
+          <div className="font-serif text-[28px] font-bold text-green-dark min-[880px]:text-[42px]">Join Us</div>
         </div>
         <div className="mb-14 grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-12">
           <div className="flex h-full flex-col">

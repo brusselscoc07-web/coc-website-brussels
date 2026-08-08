@@ -167,7 +167,7 @@ export default function SiteHeader() {
         )}
 
       {mobileMenuOpen && (
-        <div className="absolute right-8 top-full z-40 flex max-h-[calc(100vh-100px)] w-[min(260px,80vw)] flex-col gap-3.5 overflow-y-auto rounded-2xl border border-border bg-bg px-6 py-5 shadow-[0_20px_40px_rgba(20,22,18,0.18)] min-[880px]:hidden">
+        <div className="absolute right-8 top-full z-40 flex max-h-[calc(100vh-100px)] w-fit min-w-[160px] flex-col gap-3.5 overflow-y-auto rounded-2xl border border-border bg-bg px-6 py-5 shadow-[0_20px_40px_rgba(20,22,18,0.18)] min-[880px]:hidden">
           {navLinks.map((item) => {
             const active = isActive(pathname, item.key);
             return (

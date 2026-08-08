@@ -26,7 +26,7 @@ export default async function SermonsPage({
     <div className="mx-auto max-w-6xl px-8 py-20">
       <div className="mb-5 text-center">
         <div className="mb-2.5 text-[13px] tracking-[3px] text-gold uppercase">Teaching</div>
-        <div className="font-serif text-[42px] font-bold text-green-dark">Resources</div>
+        <div className="font-serif text-[28px] font-bold text-green-dark min-[880px]:text-[42px]">Resources</div>
       </div>
 
       <div className="mb-4 flex flex-wrap justify-center gap-2.5">
@@ -73,7 +73,7 @@ export default async function SermonsPage({
                   </span>
                 </div>
               )}
-              <div className="flex flex-1 flex-col p-[22px]">
+              <div className="flex flex-1 flex-col p-4 min-[880px]:p-[22px]">
                 {isThought && (
                   <div className="mb-2.5 text-[15px] font-bold tracking-[1px] text-gold uppercase">
                     Thought for the Week

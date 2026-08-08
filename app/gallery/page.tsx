@@ -38,7 +38,7 @@ export default async function GalleryPage() {
     <div className="mx-auto max-w-6xl px-8 py-20">
       <div className="mb-12 text-center">
         <div className="mb-2.5 text-[13px] tracking-[3px] text-gold uppercase">Church Life</div>
-        <div className="font-serif text-[42px] font-bold text-green-dark">Gallery</div>
+        <div className="font-serif text-[28px] font-bold text-green-dark min-[880px]:text-[42px]">Gallery</div>
       </div>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-7">
         {albumsWithCover.map((al) => (

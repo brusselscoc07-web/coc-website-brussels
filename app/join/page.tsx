@@ -11,7 +11,7 @@ export default function JoinPage() {
     <div className="mx-auto max-w-[900px] px-8 py-20">
       <div className="mb-4 text-center">
         <div className="mb-2.5 text-[13px] tracking-[3px] text-gold uppercase">Get In Touch</div>
-        <div className="font-serif text-[38px] font-bold text-green-dark">Contact Us</div>
+        <div className="font-serif text-[26px] font-bold text-green-dark min-[880px]:text-[38px]">Contact Us</div>
       </div>
       <div className="mb-12 text-center font-serif text-[17px] italic text-text-muted">
         &quot;And you shall know the truth, and the truth shall make you free.&quot; — John 8:32

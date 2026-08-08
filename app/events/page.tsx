@@ -28,7 +28,7 @@ export default async function EventsPage() {
     <div className="mx-auto max-w-[900px] px-8 py-20">
       <div className="mb-12 text-center">
         <div className="mb-2.5 text-[13px] tracking-[3px] text-gold uppercase">What&apos;s Happening</div>
-        <div className="font-serif text-[42px] font-bold text-green-dark">Upcoming Events</div>
+        <div className="font-serif text-[28px] font-bold text-green-dark min-[880px]:text-[42px]">Upcoming Events</div>
       </div>
 
       <div className="mb-10 flex flex-col gap-[18px]">
@@ -38,7 +38,7 @@ export default async function EventsPage() {
             <Link
               key={ev.id}
               href={`/events/${ev.id}`}
-              className="flex flex-wrap items-center gap-5 rounded-2xl border border-border bg-white p-[22px] no-underline"
+              className="flex flex-wrap items-center gap-5 rounded-2xl border border-border bg-white p-4 no-underline min-[880px]:p-[22px]"
             >
               <div className="w-16 shrink-0 text-center">
                 <div className="text-[22px] font-bold text-green">{badge.day}</div>

@@ -43,7 +43,7 @@ export default function AboutForm({ about }: { about: AboutSetting }) {
     <div className="max-w-3xl">
       <div className="flex flex-col gap-[18px]">
         <div className={cardClass}>
-          <div className="mb-4 text-[15px] font-semibold text-[#16233A]">Who We Are</div>
+          <div className="mb-4 text-[15px] font-semibold text-[#16233A]">What We Believe</div>
           <label className={labelClass} htmlFor="statement">
             Statement
           </label>

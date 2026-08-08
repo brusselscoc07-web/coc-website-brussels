@@ -14,6 +14,7 @@ export default function ImageFileInput({
   accept?: string;
 }) {
   const [preview, setPreview] = useState<string | null>(existingImageUrl ?? null);
+  const [fileName, setFileName] = useState<string | null>(null);
 
   // Revoke the previous blob: URL when replaced or on unmount, so picking a
   // few different files in a row doesn't leak memory.
@@ -37,17 +38,29 @@ export default function ImageFileInput({
           </svg>
         )}
       </div>
-      <input
-        id={id}
-        name={name}
-        type="file"
-        accept={accept}
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          setPreview(file ? URL.createObjectURL(file) : (existingImageUrl ?? null));
-        }}
-        className="w-full rounded-[8px] border border-[#CBD9E5] px-3.5 py-3 font-sans text-[14px]"
-      />
+      <div className="flex min-w-0 flex-1 items-center gap-3">
+        <label
+          htmlFor={id}
+          className="shrink-0 cursor-pointer rounded-[8px] bg-[#2E90D9] px-4 py-2.5 text-[13px] font-semibold text-white hover:bg-[#2679BC]"
+        >
+          Choose File
+        </label>
+        <span className="min-w-0 truncate text-[13px] text-[#7C93AA]">
+          {fileName ?? (existingImageUrl ? "Current image kept — choose a new one to replace it" : "No file chosen")}
+        </span>
+        <input
+          id={id}
+          name={name}
+          type="file"
+          accept={accept}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            setPreview(file ? URL.createObjectURL(file) : (existingImageUrl ?? null));
+            setFileName(file ? file.name : null);
+          }}
+          className="sr-only"
+        />
+      </div>
     </div>
   );
 }

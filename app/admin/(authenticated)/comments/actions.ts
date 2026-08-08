@@ -9,15 +9,15 @@ import { comments } from "@/lib/db/schema";
 import { savedRedirectPath } from "@/lib/toast";
 
 const STATUS_MESSAGE: Record<string, string> = {
-  approved: "Comment approved",
-  rejected: "Comment rejected",
+  approved: "Comment published",
+  read: "Marked as read",
   pending: "Moved back to pending",
 };
 
 // Redirects rather than returning state — see app/sermons/[slug]/actions.ts
 // for why a mutation on a page that also reads from the DB during render
 // must not resolve via an in-place re-render with PGlite in local dev.
-async function setStatus(id: string, status: "pending" | "approved" | "rejected", sermonId: string) {
+async function setStatus(id: string, status: "pending" | "approved" | "read", sermonId: string) {
   const admin = await requireAdminSession();
   const db = await getDb();
   await db
@@ -28,12 +28,12 @@ async function setStatus(id: string, status: "pending" | "approved" | "rejected"
   redirect(savedRedirectPath("/admin/comments", STATUS_MESSAGE[status]));
 }
 
-export async function approveComment(id: string, sermonId: string) {
+export async function publishComment(id: string, sermonId: string) {
   await setStatus(id, "approved", sermonId);
 }
 
-export async function rejectComment(id: string, sermonId: string) {
-  await setStatus(id, "rejected", sermonId);
+export async function markCommentAsRead(id: string, sermonId: string) {
+  await setStatus(id, "read", sermonId);
 }
 
 export async function revertToPending(id: string, sermonId: string) {

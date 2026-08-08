@@ -21,7 +21,7 @@ export default function LivestreamSection({
       <div className="mb-7 flex flex-wrap items-end justify-between gap-3">
         <div>
           <div className="mb-2 text-[13px] tracking-[3px] text-gold uppercase">Worship With Us</div>
-          <div className="font-serif text-[34px] font-bold text-green-dark">Livestream</div>
+          <div className="font-serif text-[24px] font-bold text-green-dark min-[880px]:text-[34px]">Livestream</div>
         </div>
       </div>
 

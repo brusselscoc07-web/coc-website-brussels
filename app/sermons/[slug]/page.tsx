@@ -63,7 +63,7 @@ export default async function SermonDetailPage({
       >
         ← All Posts
       </Link>
-      <div className="mb-3 mt-5 font-serif text-[38px] font-bold text-green-dark">{sermon.title}</div>
+      <div className="mb-3 mt-5 font-serif text-[26px] font-bold text-green-dark min-[880px]:text-[38px]">{sermon.title}</div>
       <div className="mb-7 flex flex-wrap gap-3.5 text-[13px] text-text-muted">
         <span>{formatDate(sermon.date)}</span>
         <span>·</span>

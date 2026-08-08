@@ -41,7 +41,7 @@ export default async function AlbumPage({ params }: { params: Promise<{ albumId:
       >
         ← All Albums
       </Link>
-      <div className="mb-2 mt-5 font-serif text-[38px] font-bold text-green-dark">{album.title}</div>
+      <div className="mb-2 mt-5 font-serif text-[26px] font-bold text-green-dark min-[880px]:text-[38px]">{album.title}</div>
       <div className="mb-9 text-[13px] text-text-muted">{formatMonthYear(album.albumDate)}</div>
       <AlbumViewer photos={photos} />
     </div>

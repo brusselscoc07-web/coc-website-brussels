@@ -12,16 +12,16 @@ export default async function SocialLinksGrid() {
           href={soc.url}
           target="_blank"
           rel="noreferrer"
-          className="flex flex-col gap-1.5 rounded-2xl border border-border bg-white p-4 no-underline min-[880px]:gap-2.5 min-[880px]:p-6"
+          className="flex min-w-0 flex-col gap-1.5 overflow-hidden rounded-2xl border border-border bg-white p-4 no-underline min-[880px]:gap-2.5 min-[880px]:p-6"
         >
           <div className="h-7 w-7 min-[880px]:h-9 min-[880px]:w-9">
             <SocialIcon platform={soc.key} size={28} />
           </div>
-          <div className="text-[11px] font-semibold tracking-[1.5px] text-green uppercase min-[880px]:text-[13px] min-[880px]:tracking-[2px]">
+          <div className="truncate text-[11px] font-semibold tracking-[1.5px] text-green uppercase min-[880px]:text-[13px] min-[880px]:tracking-[2px]">
             {soc.label}
           </div>
-          <div className="text-[13.5px] font-semibold text-green-dark min-[880px]:text-[15px]">{soc.handle}</div>
-          <div className="text-[12px] text-text-muted min-[880px]:text-[13px]">{soc.note}</div>
+          <div className="truncate text-[13px] font-semibold text-green-dark min-[880px]:text-[15px]">{soc.handle}</div>
+          <div className="truncate text-[12px] text-text-muted min-[880px]:text-[13px]">{soc.note}</div>
         </a>
       ))}
     </div>

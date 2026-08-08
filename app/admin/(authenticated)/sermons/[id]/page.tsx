@@ -15,7 +15,7 @@ export default async function EditSermonPage({ params }: { params: Promise<{ id:
 
   return (
     <div>
-      <Topbar title="Edit Resource" />
+      <Topbar title="Edit Resource" backHref="/admin/sermons" />
       <div className="mx-auto max-w-3xl px-8 py-8">
         <div className="rounded-[14px] border border-[#DCE7F0] bg-white p-6">
           <SermonForm sermon={sermon} />
