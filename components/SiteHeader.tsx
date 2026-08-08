@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { categories, navLinks, type SearchItem } from "@/lib/data";
 
 function isActive(pathname: string, key: string) {
@@ -180,67 +181,69 @@ export default function SiteHeader() {
         </>
       )}
 
-      {searchOpen && (
-        <div
-          onClick={() => setSearchOpen(false)}
-          className="fixed inset-0 z-[90] flex justify-center bg-[rgba(20,22,18,0.6)] px-5 pt-[9vh] backdrop-blur-sm"
-        >
+      {searchOpen &&
+        createPortal(
           <div
-            onClick={(e) => e.stopPropagation()}
-            className="flex max-h-[74vh] w-[min(620px,92vw)] flex-col overflow-hidden rounded-3xl bg-white shadow-[0_30px_80px_rgba(20,24,20,0.35)]"
+            onClick={() => setSearchOpen(false)}
+            className="fixed inset-0 z-[90] flex justify-center bg-[rgba(20,22,18,0.6)] px-5 pt-[9vh] backdrop-blur-sm"
           >
-            <div className="flex items-center gap-3.5 border-b border-bg-alt px-[26px] pb-[18px] pt-6">
-              <SearchIcon color="#6E6656" size={20} />
-              <input
-                autoFocus
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search sermons, events, pages..."
-                className="flex-1 border-none bg-transparent font-sans text-[17px] text-ink outline-none"
-              />
-              <button
-                aria-label="Close search"
-                onClick={() => setSearchOpen(false)}
-                className="cursor-pointer text-[20px] leading-none text-text-muted"
-              >
-                ×
-              </button>
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="flex max-h-[74vh] w-[min(620px,92vw)] flex-col overflow-hidden rounded-3xl bg-white shadow-[0_30px_80px_rgba(20,24,20,0.35)]"
+            >
+              <div className="flex items-center gap-3.5 border-b border-bg-alt px-[26px] pb-[18px] pt-6">
+                <SearchIcon color="#6E6656" size={20} />
+                <input
+                  autoFocus
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search sermons, events, pages..."
+                  className="flex-1 border-none bg-transparent font-sans text-[17px] text-ink outline-none"
+                />
+                <button
+                  aria-label="Close search"
+                  onClick={() => setSearchOpen(false)}
+                  className="cursor-pointer text-[20px] leading-none text-text-muted"
+                >
+                  ×
+                </button>
+              </div>
+              <div className="overflow-auto px-[26px] pb-[26px] pt-5">
+                {q.length > 1 && results.length > 0 && (
+                  <div className="flex flex-col gap-1.5">
+                    {results.map((r) => (
+                      <div
+                        key={r.href}
+                        onClick={() => goToResult(r.href)}
+                        className="flex cursor-pointer flex-col gap-1 rounded-2xl p-3.5 hover:bg-cream"
+                      >
+                        <span className="w-fit rounded-full bg-bg-alt px-2.5 py-[3px] text-[10.5px] font-semibold tracking-[1.2px] text-green uppercase">
+                          {r.type}
+                        </span>
+                        <div className="text-[16px] font-semibold text-green-dark">{r.title}</div>
+                        <div className="text-[13.5px] text-text-muted">{r.snippet}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {q.length > 1 && results.length === 0 && searchIndex === null && (
+                  <div className="py-10 text-center text-[14px] text-text-muted">Searching…</div>
+                )}
+                {q.length > 1 && results.length === 0 && searchIndex !== null && (
+                  <div className="py-10 text-center text-[14px] text-text-muted">
+                    No results for &quot;{query}&quot; — try different words.
+                  </div>
+                )}
+                {q.length <= 1 && (
+                  <div className="py-9 text-center text-[13.5px] text-text-faint">
+                    Start typing to search sermons, events, and pages.
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="overflow-auto px-[26px] pb-[26px] pt-5">
-              {q.length > 1 && results.length > 0 && (
-                <div className="flex flex-col gap-1.5">
-                  {results.map((r) => (
-                    <div
-                      key={r.href}
-                      onClick={() => goToResult(r.href)}
-                      className="flex cursor-pointer flex-col gap-1 rounded-2xl p-3.5 hover:bg-cream"
-                    >
-                      <span className="w-fit rounded-full bg-bg-alt px-2.5 py-[3px] text-[10.5px] font-semibold tracking-[1.2px] text-green uppercase">
-                        {r.type}
-                      </span>
-                      <div className="text-[16px] font-semibold text-green-dark">{r.title}</div>
-                      <div className="text-[13.5px] text-text-muted">{r.snippet}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {q.length > 1 && results.length === 0 && searchIndex === null && (
-                <div className="py-10 text-center text-[14px] text-text-muted">Searching…</div>
-              )}
-              {q.length > 1 && results.length === 0 && searchIndex !== null && (
-                <div className="py-10 text-center text-[14px] text-text-muted">
-                  No results for &quot;{query}&quot; — try different words.
-                </div>
-              )}
-              {q.length <= 1 && (
-                <div className="py-9 text-center text-[13.5px] text-text-faint">
-                  Start typing to search sermons, events, and pages.
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }
