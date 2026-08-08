@@ -41,10 +41,9 @@ export default async function HomePage() {
   }
 
   const todayUTC = new Date().toISOString().slice(0, 10);
-  const [latestSermon, latestThought, latestTeaching, [nextEvent]] = await Promise.all([
+  const [latestSermon, latestThought, [nextEvent]] = await Promise.all([
     pickResource("Sermon", highlights.sermonId),
     pickResource("Thought for the Week", highlights.thoughtId),
-    pickResource("Bible Teachings", highlights.teachingId),
     db.select().from(eventsTable).where(gte(eventsTable.eventDate, todayUTC)).orderBy(asc(eventsTable.eventDate)).limit(1),
   ]);
 
@@ -126,23 +125,6 @@ export default async function HomePage() {
             <div className="mb-4 text-[14px] leading-[1.6] text-text">{latestThought.excerpt}</div>
             <div className="mt-auto inline-block w-fit rounded-full bg-green px-5 py-2.5 text-[14px] font-semibold text-bg">
               Read More →
-            </div>
-          </Link>
-        )}
-
-        {latestTeaching && (
-          <Link
-            href={`/sermons/${latestTeaching.id}`}
-            className="flex flex-col rounded-[20px] border border-border bg-white p-[26px] no-underline"
-          >
-            <div className="mb-2 text-[12px] tracking-[2px] text-green uppercase">Bible Teachings</div>
-            <div className="mb-2 font-serif text-[20px] font-bold text-green-dark">{latestTeaching.title}</div>
-            {latestTeaching.scripture && (
-              <div className="mb-3.5 text-[13px] text-text-muted">{latestTeaching.scripture}</div>
-            )}
-            <div className="mb-4 text-[14px] leading-[1.6] text-text">{latestTeaching.excerpt}</div>
-            <div className="mt-auto inline-block w-fit rounded-full bg-green px-5 py-2.5 text-[14px] font-semibold text-bg">
-              Read the study →
             </div>
           </Link>
         )}

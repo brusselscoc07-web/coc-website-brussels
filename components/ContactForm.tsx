@@ -22,7 +22,7 @@ export default function ContactForm() {
         <input
           name="name"
           placeholder="Name"
-          className="w-full rounded-[10px] border-2 border-border px-4 py-3.5 font-sans text-[14px]"
+          className="w-full rounded-[10px] border-2 border-border px-4 py-3.5 font-sans text-[16px] min-[880px]:text-[14px]"
         />
         {state.fieldErrors?.name && <p className="mt-1.5 text-[13px] text-live">{state.fieldErrors.name}</p>}
       </div>
@@ -30,7 +30,7 @@ export default function ContactForm() {
         <input
           name="email"
           placeholder="Email"
-          className="w-full rounded-[10px] border-2 border-border px-4 py-3.5 font-sans text-[14px]"
+          className="w-full rounded-[10px] border-2 border-border px-4 py-3.5 font-sans text-[16px] min-[880px]:text-[14px]"
         />
         {state.fieldErrors?.email && <p className="mt-1.5 text-[13px] text-live">{state.fieldErrors.email}</p>}
       </div>
@@ -39,7 +39,7 @@ export default function ContactForm() {
           name="message"
           placeholder="Message"
           rows={10}
-          className="min-h-[220px] w-full resize-y rounded-[10px] border-2 border-border px-4 py-3.5 font-sans text-[14px]"
+          className="min-h-[220px] w-full resize-y rounded-[10px] border-2 border-border px-4 py-3.5 font-sans text-[16px] min-[880px]:text-[14px]"
         />
         {state.fieldErrors?.message && <p className="mt-1.5 text-[13px] text-live">{state.fieldErrors.message}</p>}
       </div>

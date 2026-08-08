@@ -334,17 +334,6 @@ export const events: ChurchEvent[] = [
     past: false,
   },
   {
-    id: "easter-convention",
-    title: "Easter Convention",
-    day: "5",
-    month: "APR",
-    date: "April 5, 2026",
-    time: "All day",
-    desc: "Our annual Easter gathering with guest preachers from across Belgium.",
-    location: "",
-    past: true,
-  },
-  {
     id: "spring-revival",
     title: "Spring Revival Week",
     day: "9",

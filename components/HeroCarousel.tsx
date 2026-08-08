@@ -59,7 +59,7 @@ export default function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
   if (slides.length === 0) return null;
 
   return (
-    <div className="relative h-[min(88vh,760px)] min-h-[480px] overflow-hidden text-center text-bg">
+    <div className="relative h-[min(74vh,760px)] min-h-[420px] overflow-hidden text-center text-bg min-[880px]:h-[min(88vh,760px)] min-[880px]:min-h-[480px]">
       <div
         className="flex h-full transition-transform duration-700 ease-[cubic-bezier(0.65,0,0.35,1)]"
         style={{ width: `${count * 100}%`, transform: `translateX(-${index * (100 / count)}%)` }}
@@ -82,7 +82,7 @@ export default function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
               className="absolute inset-0"
               style={{ background: "linear-gradient(180deg, rgba(27,46,37,0.15), rgba(27,46,37,0.55))" }}
             />
-            <div className="relative z-[2] max-w-[720px] px-6 pb-[150px]">
+            <div className="relative z-[2] max-w-[720px] px-6 pb-[110px] min-[880px]:pb-[150px]">
               <div className="mb-[18px] text-[13px] tracking-[4px] text-gold-light uppercase">Welcome</div>
               <div className="mb-[18px] font-serif text-[clamp(38px,6vw,64px)] font-bold leading-[1.05]">
                 {slide.headline}
@@ -101,6 +101,24 @@ export default function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
                 >
                   Contact
                 </Link>
+              </div>
+              <div className="mt-5 flex justify-center min-[880px]:hidden">
+                <svg
+                  className="animate-bounce opacity-80"
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M6 9l6 6 6-6"
+                    stroke="#F1E9D8"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
               </div>
             </div>
           </div>
@@ -160,6 +178,7 @@ export default function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
           ))}
         </div>
       )}
+
     </div>
   );
 }

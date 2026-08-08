@@ -157,34 +157,37 @@ export default function SiteHeader() {
         </div>
       </div>
 
-      {mobileMenuOpen && (
-        <>
+      {mobileMenuOpen &&
+        createPortal(
           <div
             onClick={() => setMobileMenuOpen(false)}
             className="fixed inset-0 z-30 bg-black/30 min-[880px]:hidden"
-          />
-          <div className="absolute inset-x-0 top-full z-40 flex max-h-[calc(100vh-72px)] flex-col gap-4 overflow-y-auto border-t border-border bg-bg px-8 pb-6 pt-[18px] shadow-[0_20px_40px_rgba(20,22,18,0.18)] min-[880px]:hidden">
-            {navLinks.map((item) => {
-              const active = isActive(pathname, item.key);
-              return (
-                <Link
-                  key={item.key}
-                  href={item.href}
-                  className="text-[16px] no-underline"
-                  style={{ color: active ? "#2C4A3D" : "#201F1B", fontWeight: active ? 700 : 500 }}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-            <Link
-              href="/join"
-              className="cursor-pointer self-start rounded-full bg-green px-[22px] py-2.5 text-[14px] tracking-[0.4px] text-bg no-underline"
-            >
-              Join Us
-            </Link>
-          </div>
-        </>
+          />,
+          document.body,
+        )}
+
+      {mobileMenuOpen && (
+        <div className="absolute right-8 top-full z-40 flex max-h-[calc(100vh-100px)] w-[min(260px,80vw)] flex-col gap-3.5 overflow-y-auto rounded-2xl border border-border bg-bg px-6 py-5 shadow-[0_20px_40px_rgba(20,22,18,0.18)] min-[880px]:hidden">
+          {navLinks.map((item) => {
+            const active = isActive(pathname, item.key);
+            return (
+              <Link
+                key={item.key}
+                href={item.href}
+                className="text-[16px] no-underline"
+                style={{ color: active ? "#2C4A3D" : "#201F1B", fontWeight: active ? 700 : 500 }}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+          <Link
+            href="/join"
+            className="cursor-pointer self-start rounded-full bg-green px-[22px] py-2.5 text-[14px] tracking-[0.4px] text-bg no-underline"
+          >
+            Join Us
+          </Link>
+        </div>
       )}
 
       {searchOpen &&
