@@ -36,7 +36,7 @@ export default async function SermonsPage({
             <Link
               key={c}
               href={c === "All" ? "/sermons" : `/sermons?category=${encodeURIComponent(c)}`}
-              className="cursor-pointer rounded-full border px-[18px] py-2 text-[13px] no-underline"
+              className="cursor-pointer rounded-full border-2 px-[18px] py-2 text-[13px] no-underline"
               style={{
                 borderColor: active ? "#2C4A3D" : "#E7DFCE",
                 background: active ? "#2C4A3D" : "#FFFFFF",
@@ -58,7 +58,7 @@ export default async function SermonsPage({
             <Link
               key={sm.id}
               href={`/sermons/${sm.id}`}
-              className="flex flex-col overflow-hidden rounded-[20px] border border-border bg-white no-underline"
+              className="flex flex-col overflow-hidden rounded-[20px] border-2 border-border bg-white no-underline"
             >
               {!isThought && (
                 <div

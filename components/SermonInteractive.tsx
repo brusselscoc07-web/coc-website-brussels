@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useRef, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import type { Comment } from "@/lib/data";
 import { submitComment, type CommentFormState } from "@/app/sermons/[slug]/actions";
 import { toggleReaction } from "@/app/sermons/[slug]/reactions";
@@ -10,6 +10,7 @@ const initialCommentState: CommentFormState = {};
 
 export default function SermonInteractive({
   sermonId,
+  sermonTitle,
   shareUrl,
   justCommented,
   comments,
@@ -17,6 +18,7 @@ export default function SermonInteractive({
   initialMyReaction,
 }: {
   sermonId: string;
+  sermonTitle: string;
   shareUrl: string;
   justCommented: boolean;
   comments: Comment[];
@@ -28,8 +30,17 @@ export default function SermonInteractive({
   const [reactions, setReactions] = useState(initialReactions);
   const [myReaction, setMyReaction] = useState<ReactionKind | null>(initialMyReaction);
   const [reactionPending, setReactionPending] = useState(false);
+  const [origin, setOrigin] = useState("");
   const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const linkInputRef = useRef<HTMLInputElement>(null);
+
+  // Empty on the server and on first paint, filled in after mount — keeps
+  // the initial client render matching the server render (no hydration
+  // mismatch) while still producing a real absolute, shareable URL.
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
+  const absoluteShareUrl = `${origin}${shareUrl}`;
 
   const [commentState, commentFormAction, isCommentPending] = useActionState(
     submitComment.bind(null, sermonId),
@@ -73,22 +84,22 @@ export default function SermonInteractive({
 
   function copyLink() {
     // clipboard may be unavailable or denied — modal still shows the link to copy manually
-    navigator.clipboard?.writeText(shareUrl).catch(() => {});
+    navigator.clipboard?.writeText(absoluteShareUrl).catch(() => {});
     setCopyModalOpen(true);
     setCopyButtonState("copied");
     if (copyTimer.current) clearTimeout(copyTimer.current);
     copyTimer.current = setTimeout(() => setCopyButtonState("idle"), 1800);
   }
 
-  const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
-  const whatsappShareUrl = `https://wa.me/?text=${encodeURIComponent(shareUrl)}`;
+  const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(absoluteShareUrl)}&quote=${encodeURIComponent(sermonTitle)}`;
+  const whatsappShareUrl = `https://wa.me/?text=${encodeURIComponent(`${sermonTitle} — ${absoluteShareUrl}`)}`;
 
   return (
     <>
       <div className="mb-10 flex flex-wrap gap-3">
         <button
           onClick={copyLink}
-          className="flex cursor-pointer items-center gap-1.5 rounded-full border border-border px-4 py-2 text-[13px] text-text"
+          className="flex cursor-pointer items-center gap-1.5 rounded-full border-2 border-border px-4 py-2 text-[13px] text-text"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
             <path
@@ -110,7 +121,7 @@ export default function SermonInteractive({
           href={facebookShareUrl}
           target="_blank"
           rel="noreferrer"
-          className="flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-[13px] text-text no-underline"
+          className="flex items-center gap-1.5 rounded-full border-2 border-border px-4 py-2 text-[13px] text-text no-underline"
         >
           <svg width="16" height="16" viewBox="0 0 24 24">
             <rect width="24" height="24" rx="6" fill="#1877F2" />
@@ -125,7 +136,7 @@ export default function SermonInteractive({
           href={whatsappShareUrl}
           target="_blank"
           rel="noreferrer"
-          className="flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-[13px] text-text no-underline"
+          className="flex items-center gap-1.5 rounded-full border-2 border-border px-4 py-2 text-[13px] text-text no-underline"
         >
           <svg width="16" height="16" viewBox="0 0 24 24">
             <rect width="24" height="24" rx="6" fill="#25D366" />
@@ -155,9 +166,9 @@ export default function SermonInteractive({
               <input
                 ref={linkInputRef}
                 readOnly
-                value={shareUrl}
+                value={absoluteShareUrl}
                 onClick={(e) => e.currentTarget.select()}
-                className="min-w-0 flex-1 rounded-[10px] border border-border bg-bg px-3.5 py-3 font-sans text-[13.5px] text-ink-soft"
+                className="min-w-0 flex-1 rounded-[10px] border-2 border-border bg-bg px-3.5 py-3 font-sans text-[13.5px] text-ink-soft"
               />
               <button
                 onClick={copyLink}
@@ -173,7 +184,7 @@ export default function SermonInteractive({
         </div>
       )}
 
-      <div className="mb-12 flex flex-wrap gap-3 border-y border-border py-5">
+      <div className="mb-12 flex flex-wrap gap-3 border-y-2 border-border py-5">
         <button
           onClick={() => react("heart")}
           className="flex cursor-pointer items-center gap-2 rounded-full px-4 py-2.5 text-[14px]"
@@ -197,31 +208,38 @@ export default function SermonInteractive({
         </button>
       </div>
 
-      <div className="mb-5 font-serif text-[24px] font-bold text-green-dark">Comments</div>
+      <div className="mb-5 font-serif text-[24px] font-bold text-green-dark">Comments/Questions</div>
       {justCommented && (
         <div className="mb-5 rounded-xl bg-bg-alt px-5 py-4 text-[14px] text-text">
-          Thanks — your comment has been submitted and is awaiting approval before it appears publicly.
+          Thanks — your comment/question has been submitted and is awaiting approval before it appears publicly.
         </div>
       )}
       <form action={commentFormAction} className="mb-7 flex flex-col gap-2.5">
         <input
           name="name"
           placeholder="Your name"
-          className="rounded-[10px] border border-border px-4 py-3 font-sans text-[14px]"
+          required
+          className="rounded-[10px] border-2 border-border px-4 py-3 font-sans text-[14px]"
         />
         {commentState.fieldErrors?.name && (
           <p className="text-[13px] text-live">{commentState.fieldErrors.name}</p>
         )}
         <input
           name="email"
-          placeholder="Email (optional, not published)"
-          className="rounded-[10px] border border-border px-4 py-3 font-sans text-[14px]"
+          type="email"
+          placeholder="Email (required, not published)"
+          required
+          className="rounded-[10px] border-2 border-border px-4 py-3 font-sans text-[14px]"
         />
+        {commentState.fieldErrors?.email && (
+          <p className="text-[13px] text-live">{commentState.fieldErrors.email}</p>
+        )}
         <textarea
           name="text"
-          placeholder="Write a comment..."
+          placeholder="Write a comment or question..."
           rows={3}
-          className="resize-y rounded-[10px] border border-border px-4 py-3 font-sans text-[14px]"
+          required
+          className="resize-y rounded-[10px] border-2 border-border px-4 py-3 font-sans text-[14px]"
         />
         {commentState.fieldErrors?.text && (
           <p className="text-[13px] text-live">{commentState.fieldErrors.text}</p>
@@ -234,12 +252,12 @@ export default function SermonInteractive({
           disabled={isCommentPending}
           className="cursor-pointer self-start rounded-full bg-green px-[22px] py-2.5 text-[14px] text-bg disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {isCommentPending ? "Posting…" : "Post Comment"}
+          {isCommentPending ? "Sending…" : "Send"}
         </button>
       </form>
       <div className="flex flex-col gap-5">
         {comments.map((cm, i) => (
-          <div key={i} className="border-t border-border pt-4">
+          <div key={i} className="border-t-2 border-border pt-4">
             <div className="mb-1.5 flex items-baseline gap-2.5">
               <span className="text-[14px] font-semibold text-green-dark">{cm.name}</span>
               <span className="text-[12px] text-text-muted">{cm.date}</span>

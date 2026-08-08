@@ -60,6 +60,23 @@ export default function AboutForm({ about }: { about: AboutSetting }) {
         </div>
 
         <div className={cardClass}>
+          <div className="mb-4 text-[15px] font-semibold text-[#16233A]">The Plan of Salvation</div>
+          <label className={labelClass} htmlFor="planOfSalvation">
+            Statement
+          </label>
+          <textarea
+            id="planOfSalvation"
+            value={draft.planOfSalvation}
+            onChange={field("planOfSalvation")}
+            rows={5}
+            className={`${inputClass} resize-y`}
+          />
+          {state.fieldErrors?.planOfSalvation && (
+            <p className="mt-1.5 text-[13px] text-[#C13B3B]">{state.fieldErrors.planOfSalvation}</p>
+          )}
+        </div>
+
+        <div className={cardClass}>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
             <div className="text-[15px] font-semibold text-[#16233A]">Our Worship Consists Of</div>
             <button type="button" onClick={addWorshipItem} className="cursor-pointer text-[13px] text-[#2E90D9]">
@@ -116,6 +133,22 @@ export default function AboutForm({ about }: { about: AboutSetting }) {
                 <p className="mt-1.5 text-[13px] text-[#C13B3B]">{state.fieldErrors.preacher}</p>
               )}
             </div>
+          </div>
+
+          <div className="mt-4">
+            <label className={labelClass} htmlFor="preacherBio">
+              Preacher bio
+            </label>
+            <textarea
+              id="preacherBio"
+              value={draft.preacherBio}
+              onChange={field("preacherBio")}
+              rows={4}
+              className={`${inputClass} resize-y`}
+            />
+            {state.fieldErrors?.preacherBio && (
+              <p className="mt-1.5 text-[13px] text-[#C13B3B]">{state.fieldErrors.preacherBio}</p>
+            )}
           </div>
 
           <p className="mt-3 text-[12px] text-[#7C93AA]">

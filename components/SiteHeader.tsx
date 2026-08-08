@@ -93,6 +93,12 @@ export default function SiteHeader() {
                   </span>
                   {resourcesOpen && (
                     <div className="absolute left-0 top-full z-50 mt-3 min-w-[200px] rounded-2xl border border-border bg-white p-2 shadow-[0_20px_40px_rgba(20,22,18,0.15)]">
+                      <Link
+                        href="/sermons"
+                        className="block rounded-lg px-3.5 py-2.5 text-[14px] font-semibold text-green no-underline hover:bg-bg-alt"
+                      >
+                        All Resources
+                      </Link>
                       {categories
                         .filter((c) => c !== "All")
                         .map((c) => (

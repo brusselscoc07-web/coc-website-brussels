@@ -68,6 +68,7 @@ export default async function HomePage() {
         nextServiceIso={nextService?.toISOString() ?? null}
         zoomLink={about.zoomLink}
         streamingLocation={about.worshipPlace}
+        youtubeUrl={site.socialLinks.find((s) => s.key === "youtube")?.url}
       />
 
       <div className="mx-auto grid max-w-6xl grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-7 px-8 pb-16 pt-14">

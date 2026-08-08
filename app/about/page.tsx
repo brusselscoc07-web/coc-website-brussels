@@ -46,10 +46,7 @@ export default async function AboutPage() {
         </div>
         <div>
           <div className="mb-3 font-serif text-[22px] font-bold text-green">The Plan of Salvation</div>
-          <div className="text-[15px] leading-[1.8] text-text">
-            We believe salvation comes through hearing the Gospel, believing in Christ, repenting of sin, confessing
-            His name, and being baptized for the forgiveness of sins — followed by a life of faithful discipleship.
-          </div>
+          <div className="text-[15px] leading-[1.8] text-text">{about.planOfSalvation}</div>
         </div>
       </div>
 
@@ -61,10 +58,7 @@ export default async function AboutPage() {
         <div>
           <div className="font-serif text-[24px] font-bold text-green-dark">{about.preacher}</div>
           <div className="my-1.5 text-[13px] tracking-[2px] text-gold uppercase">Preaching Minister</div>
-          <div className="text-[14px] leading-[1.7] text-text">
-            Joseph has served the congregation for over a decade, shepherding the church through teaching, counsel,
-            and a steady example of faith lived out in daily life.
-          </div>
+          <div className="text-[14px] leading-[1.7] text-text">{about.preacherBio}</div>
         </div>
       </div>
 
@@ -113,7 +107,20 @@ export default async function AboutPage() {
             </div>
             <div>
               <div className="mb-1 text-[11px] tracking-[1.5px] text-gold uppercase">Zoom</div>
-              <a href={about.zoomLink || "#"} target="_blank" rel="noreferrer" className="text-[15px] font-semibold text-green no-underline">
+              <a
+                href={about.zoomLink || "#"}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-1.5 text-[15px] font-semibold text-green no-underline"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" className="shrink-0">
+                  <rect width="24" height="24" rx="6" fill="#2D8CFF" />
+                  <path
+                    d="M6 9a1.5 1.5 0 011.5-1.5h6A1.5 1.5 0 0115 9v6a1.5 1.5 0 01-1.5 1.5h-6A1.5 1.5 0 016 15z"
+                    fill="#fff"
+                  />
+                  <path d="M15.5 10.3l2.6-1.6a.7.7 0 011.1.6v5.4a.7.7 0 01-1.1.6l-2.6-1.6z" fill="#fff" />
+                </svg>
                 Join on Zoom →
               </a>
               <div className="mt-0.5 text-[12px] text-text-muted">{about.zoomNote}</div>

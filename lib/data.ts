@@ -42,7 +42,7 @@ export type Album = {
 };
 
 export type SocialLink = {
-  key: "youtube" | "facebook" | "instagram" | "whatsapp";
+  key: "youtube" | "facebook" | "whatsapp";
   label: string;
   handle: string;
   note: string;
@@ -188,6 +188,62 @@ export const sermons: Sermon[] = [
     ],
     hasVideo: false,
   },
+  {
+    id: "peace-that-guards",
+    title: "The Peace That Guards Your Heart",
+    date: "July 29, 2026",
+    preacher: "Bro. Joseph Acheampong",
+    scripture: "Philippians 4:6-7",
+    category: "Thought for the Week",
+    excerpt: "A short word on trading anxiety for prayer this week.",
+    body: [
+      "Paul doesn't tell us not to feel anxious — he tells us what to do with it: bring it to God in prayer with thanksgiving.",
+      "The peace that follows isn't the absence of a problem; it's a guard stationed over your heart and mind while the problem is still there.",
+    ],
+    hasVideo: false,
+  },
+  {
+    id: "small-things-faithfully",
+    title: "Doing Small Things Faithfully",
+    date: "August 5, 2026",
+    preacher: "Bro. Joseph Acheampong",
+    scripture: "Luke 16:10",
+    category: "Thought for the Week",
+    excerpt: "Faithfulness in the ordinary is the training ground for faithfulness in the significant.",
+    body: [
+      "Jesus ties trustworthiness in little things directly to trustworthiness in much — there's no separate track for \"big\" faithfulness.",
+      "This week, look for one small, unnoticed responsibility and do it as an act of worship rather than an inconvenience.",
+    ],
+    hasVideo: false,
+  },
+  {
+    id: "the-fruit-of-the-spirit",
+    title: "The Fruit of the Spirit",
+    date: "July 25, 2026",
+    preacher: "Bro. Joseph Acheampong",
+    scripture: "Galatians 5:22-23",
+    category: "Bible Teachings",
+    excerpt: "A study on the character the Spirit produces in a life surrendered to God.",
+    body: [
+      "Paul contrasts the works of the flesh with the fruit of the Spirit — not a checklist to perform, but a harvest that grows from abiding in Christ.",
+      "We looked at each of the nine qualities in turn and asked what cultivating them practically looks like in the coming weeks.",
+    ],
+    hasVideo: true,
+  },
+  {
+    id: "the-armor-of-god",
+    title: "The Armor of God",
+    date: "August 1, 2026",
+    preacher: "Bro. Joseph Acheampong",
+    scripture: "Ephesians 6:10-18",
+    category: "Bible Teachings",
+    excerpt: "Understanding the spiritual armor Paul describes and how to put it on daily.",
+    body: [
+      "Paul's list of armor — truth, righteousness, the gospel of peace, faith, salvation, the Spirit's sword, and prayer — describes a defense that is entirely provided, not self-manufactured.",
+      "We considered practical ways to \"put on\" each piece each morning rather than treating this as a one-time decision.",
+    ],
+    hasVideo: false,
+  },
 ];
 
 export const mockComments: Record<string, Comment[]> = {
@@ -223,11 +279,22 @@ export const mockComments: Record<string, Comment[]> = {
 
 export const events: ChurchEvent[] = [
   {
+    id: "ladies-fellowship",
+    title: "Ladies' Fellowship Brunch",
+    day: "16",
+    month: "AUG",
+    date: "August 16, 2026",
+    time: "11:00 AM",
+    desc: "A morning of food, fellowship, and encouragement for the women of our congregation.",
+    location: "",
+    past: false,
+  },
+  {
     id: "youth-bible-camp",
     title: "Youth Bible Camp 2026",
-    day: "14",
+    day: "21",
     month: "AUG",
-    date: "August 14–16, 2026",
+    date: "August 21–23, 2026",
     time: "All day",
     desc: "Three days of worship, teaching, and fellowship for our youth, held at a retreat centre outside Brussels.",
     location: "Domaine de Chevetogne, Belgium",
@@ -236,33 +303,33 @@ export const events: ChurchEvent[] = [
   {
     id: "baptism-sunday",
     title: "Baptism Sunday",
-    day: "2",
+    day: "30",
     month: "AUG",
-    date: "August 2, 2026",
+    date: "August 30, 2026",
     time: "12:30 PM",
     desc: "Join us as we celebrate new believers publicly professing their faith through baptism.",
     location: "",
     past: false,
   },
   {
-    id: "ladies-fellowship",
-    title: "Ladies' Fellowship Brunch",
-    day: "9",
-    month: "AUG",
-    date: "August 9, 2026",
-    time: "11:00 AM",
-    desc: "A morning of food, fellowship, and encouragement for the women of our congregation.",
+    id: "communion-night",
+    title: "Communion & Fellowship Night",
+    day: "6",
+    month: "SEP",
+    date: "September 6, 2026",
+    time: "7:00 PM",
+    desc: "An evening of communion, testimony, and worship together as one body.",
     location: "",
     past: false,
   },
   {
-    id: "communion-night",
-    title: "Communion & Fellowship Night",
-    day: "22",
-    month: "AUG",
-    date: "August 22, 2026",
-    time: "7:00 PM",
-    desc: "An evening of communion, testimony, and worship together as one body.",
+    id: "fall-bible-conference",
+    title: "Fall Bible Conference",
+    day: "19",
+    month: "SEP",
+    date: "September 19–20, 2026",
+    time: "All day",
+    desc: "A weekend conference with guest preachers from across Belgium focused on the book of Romans.",
     location: "",
     past: false,
   },
@@ -302,7 +369,7 @@ export const albums: Album[] = [
     id: "youth-retreat-2026",
     title: "Youth Retreat 2026",
     date: "June 2026",
-    photos: buildAlbumPhotos("yr", 9, "Youth Retreat 2026"),
+    photos: buildAlbumPhotos("yr", 6, "Youth Retreat 2026", 0),
   },
   {
     id: "baptism-sunday-album",
@@ -314,7 +381,13 @@ export const albums: Album[] = [
     id: "christmas-2025",
     title: "Christmas Fellowship 2025",
     date: "December 2025",
-    photos: buildAlbumPhotos("xm", 9, "Christmas Fellowship 2025", 0),
+    photos: buildAlbumPhotos("xm", 6, "Christmas Fellowship 2025", 0),
+  },
+  {
+    id: "ladies-brunch-2026",
+    title: "Ladies' Fellowship Brunch",
+    date: "May 2026",
+    photos: buildAlbumPhotos("lb", 6, "Ladies' Fellowship Brunch", 0),
   },
 ];
 

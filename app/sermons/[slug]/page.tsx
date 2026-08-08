@@ -117,7 +117,8 @@ export default async function SermonDetailPage({
 
       <SermonInteractive
         sermonId={sermon.id}
-        shareUrl={videoUrl}
+        sermonTitle={sermon.title}
+        shareUrl={`/sermons/${sermon.id}`}
         justCommented={commented === "1"}
         comments={approvedComments.map((c) => ({ name: c.name, date: formatDate(c.createdAt), text: c.text }))}
         initialReactions={initialReactions}

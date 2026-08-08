@@ -8,11 +8,13 @@ export default function LivestreamSection({
   nextServiceIso,
   zoomLink,
   streamingLocation,
+  youtubeUrl,
 }: {
   live: boolean;
   nextServiceIso: string | null;
   zoomLink?: string;
   streamingLocation?: string;
+  youtubeUrl?: string;
 }) {
   return (
     <div className="mx-auto max-w-6xl px-8 pt-16">
@@ -76,7 +78,7 @@ export default function LivestreamSection({
               Watch past sermons
             </Link>
             <a
-              href="https://youtube.com"
+              href={youtubeUrl || "https://youtube.com"}
               target="_blank"
               rel="noreferrer"
               className="rounded-full border-[1.5px] border-green px-6 py-3 text-[14px] text-green no-underline"

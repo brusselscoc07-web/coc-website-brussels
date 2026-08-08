@@ -1,15 +1,20 @@
 "use server";
 
+import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { getDb } from "@/lib/db";
-import { comments } from "@/lib/db/schema";
+import { comments, sermons } from "@/lib/db/schema";
+import { env } from "@/lib/env";
+import { sendEmail } from "@/lib/email";
 import { checkRateLimit, RATE_LIMIT_MESSAGE } from "@/lib/rate-limit";
 import { commentSchema } from "@/lib/validation/comment";
 
 export type CommentFormState = {
   error?: string;
-  fieldErrors?: Partial<Record<"name" | "text", string>>;
+  fieldErrors?: Partial<Record<"name" | "email" | "text", string>>;
 };
+
+const DEFAULT_NOTIFY_EMAIL = "office@cocbrussels.example";
 
 function str(value: FormDataEntryValue | null): string | undefined {
   return value === null ? undefined : String(value);
@@ -41,18 +46,27 @@ export async function submitComment(
     const fieldErrors: NonNullable<CommentFormState["fieldErrors"]> = {};
     for (const issue of parsed.error.issues) {
       const key = issue.path[0];
-      if (key === "name" || key === "text") fieldErrors[key] = issue.message;
+      if (key === "name" || key === "email" || key === "text") fieldErrors[key] = issue.message;
     }
     return { error: "Please fix the errors below.", fieldErrors };
   }
 
   const db = await getDb();
+  const [sermon] = await db.select().from(sermons).where(eq(sermons.id, sermonId));
+
   await db.insert(comments).values({
     sermonId,
     name: parsed.data.name,
-    email: parsed.data.email || null,
+    email: parsed.data.email,
     text: parsed.data.text,
     status: "pending",
+  });
+
+  await sendEmail({
+    to: env.CONTACT_NOTIFY_EMAIL || DEFAULT_NOTIFY_EMAIL,
+    replyTo: parsed.data.email,
+    subject: `New comment/question on "${sermon?.title ?? sermonId}"`,
+    text: `Name: ${parsed.data.name}\nEmail: ${parsed.data.email}\nSermon: ${sermon?.title ?? sermonId}\n\n${parsed.data.text}`,
   });
 
   // No revalidatePath — this comment is pending moderation and shouldn't

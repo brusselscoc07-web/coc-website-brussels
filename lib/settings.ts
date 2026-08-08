@@ -16,9 +16,11 @@ export async function getLivestreamStatus(): Promise<LivestreamSetting> {
 export type WorshipItem = { id: string; label: string };
 export type AboutSetting = {
   statement: string;
+  planOfSalvation: string;
   worshipItems: WorshipItem[];
   worshipPlace: string;
   preacher: string;
+  preacherBio: string;
   zoomLink: string;
   zoomNote: string;
 };
@@ -29,6 +31,8 @@ export type AboutSetting = {
 const DEFAULT_ABOUT: AboutSetting = {
   statement:
     "We have no creed but Christ, no book but the Bible. We seek to be simply Christians, wearing no denominational name and holding only to the teaching of the New Testament as our guide for faith and practice.",
+  planOfSalvation:
+    "We believe salvation comes through hearing the Gospel, believing in Christ, repenting of sin, confessing His name, and being baptized for the forgiveness of sins — followed by a life of faithful discipleship.",
   worshipItems: [
     { id: "wi1", label: "Prayer" },
     { id: "wi2", label: "Singing" },
@@ -38,6 +42,8 @@ const DEFAULT_ABOUT: AboutSetting = {
   ],
   worshipPlace: "Shalom Center",
   preacher: "Bro. Joseph Acheampong",
+  preacherBio:
+    "Joseph has served the congregation for over a decade, shepherding the church through teaching, counsel, and a steady example of faith lived out in daily life.",
   zoomLink: "https://zoom.us/j/1234567890",
   zoomNote: "Same as worship time",
 };
@@ -69,22 +75,27 @@ const DEFAULT_SITE: SiteSetting = {
     { id: "st2", day: "Sunday", start: { hour: 12, minute: 30, period: "PM" }, end: { hour: 3, minute: 0, period: "PM" } },
   ],
   socialLinks: [
-    { key: "youtube", label: "YouTube", handle: "@cocbrussels", note: "Watch our sermons", url: "https://youtube.com" },
+    {
+      key: "youtube",
+      label: "YouTube",
+      handle: "@BrusselsChurchofChrist",
+      note: "Watch our sermons",
+      url: "https://www.youtube.com/@BrusselsChurchofChrist",
+    },
     {
       key: "facebook",
       label: "Facebook",
       handle: "Church of Christ Brussels",
       note: "Follow our page",
-      url: "https://facebook.com",
+      url: "https://www.facebook.com/share/1GZupdP4vH/?mibextid=wwXIfr",
     },
     {
-      key: "instagram",
-      label: "Instagram",
-      handle: "@cocbrussels",
-      note: "See our latest moments",
-      url: "https://instagram.com",
+      key: "whatsapp",
+      label: "WhatsApp",
+      handle: "+32 466 07 48 92",
+      note: "Chat with us",
+      url: "https://wa.me/32466074892",
     },
-    { key: "whatsapp", label: "WhatsApp", handle: "+32 2 123 45 67", note: "Chat with us", url: "https://wa.me/3221234567" },
   ],
 };
 

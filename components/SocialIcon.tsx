@@ -20,16 +20,6 @@ export default function SocialIcon({ platform, size = 36 }: { platform: SocialLi
       </svg>
     );
   }
-  if (platform === "instagram") {
-    return (
-      <svg width={size} height={size} viewBox="0 0 24 24">
-        <rect width="24" height="24" rx="6" fill="#C13584" />
-        <rect x="6" y="6" width="12" height="12" rx="4" fill="none" stroke="#fff" strokeWidth="1.5" />
-        <circle cx="12" cy="12" r="3" fill="none" stroke="#fff" strokeWidth="1.5" />
-        <circle cx="15.7" cy="8.3" r="1" fill="#fff" />
-      </svg>
-    );
-  }
   return (
     <svg width={size} height={size} viewBox="0 0 24 24">
       <rect width="24" height="24" rx="6" fill="#25D366" />
